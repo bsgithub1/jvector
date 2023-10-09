@@ -19,8 +19,6 @@ package io.github.jbellis.jvector.pq;
 import io.github.jbellis.jvector.disk.Io;
 import io.github.jbellis.jvector.disk.RandomAccessReader;
 import io.github.jbellis.jvector.graph.RandomAccessVectorValues;
-import io.github.jbellis.jvector.util.RamUsageEstimator;
-import io.github.jbellis.jvector.util.PhysicalCoreExecutor;
 import io.github.jbellis.jvector.vector.VectorUtil;
 
 import java.io.DataOutput;
@@ -39,15 +37,16 @@ import static java.lang.Math.min;
  * A Product Quantization implementation for float vectors.
  */
 public class ProductQuantization {
-    static final int CLUSTERS = 256; // number of clusters per subspace = one byte's worth
-    private static final int K_MEANS_ITERATIONS = 6;
-    private static final int MAX_PQ_TRAINING_SET_SIZE = 128000;
+    private static final int CLUSTERS = 256; // number of clusters per subspace = one byte's worth
+    private static final int K_MEANS_ITERATIONS = 15; // VSTODO try 20 as well
+    private static final int MAX_PQ_TRAINING_SET_SIZE = 256000;
 
-    final float[][][] codebooks;
-    final int M;
+    private final float[][][] codebooks;
+    private final int M;
     private final int originalDimension;
     private final float[] globalCentroid;
-    final int[][] subvectorSizesAndOffsets;
+    private final int[][] subvectorSizesAndOffsets;
+    private final ThreadLocal<float[]> scratch;
 
     /**
      * Initializes the codebooks by clustering the input data using Product Quantization.
@@ -74,8 +73,7 @@ public class ProductQuantization {
         if (globallyCenter) {
             globalCentroid = KMeansPlusPlusClusterer.centroidOf(vectors);
             // subtract the centroid from each vector
-            List<float[]> finalVectors = vectors;
-            vectors = PhysicalCoreExecutor.instance.submit(() -> finalVectors.stream().parallel().map(v -> VectorUtil.sub(v, globalCentroid)).collect(Collectors.toList()));
+            vectors = vectors.stream().parallel().map(v -> VectorUtil.sub(v, globalCentroid)).collect(Collectors.toList());
         } else {
             globalCentroid = null;
         }
@@ -98,13 +96,14 @@ public class ProductQuantization {
             offset += size;
         }
         this.originalDimension = Arrays.stream(subvectorSizesAndOffsets).mapToInt(m -> m[0]).sum();
+        this.scratch = ThreadLocal.withInitial(() -> new float[subvectorSizesAndOffsets.length]);
     }
 
     /**
      * Encodes the given vectors in parallel using the PQ codebooks.
      */
-    public byte[][] encodeAll(List<float[]> vectors) {
-        return PhysicalCoreExecutor.instance.submit(() ->vectors.stream().parallel().map(this::encode).toArray(byte[][]::new));
+    public List<byte[]> encodeAll(List<float[]> vectors) {
+        return vectors.stream().parallel().map(this::encode).collect(Collectors.toList());
     }
 
     /**
@@ -126,30 +125,46 @@ public class ProductQuantization {
     }
 
     /**
-     * Computes the cosine of the (approximate) original decoded vector with
+     * Computes the dot product of the (approximate) original decoded vector with
      * another vector.
      * <p>
-     * This method can compute the cosine without materializing the decoded vector as a new float[],
-     * which will be roughly 1.5x as fast as decode() + dot().
+     * This method can compute the dot product without materializing the decoded vector as a new float[],
+     * which will be roughly 2x as fast as decode() + dot().
      * <p>
      * It is the caller's responsibility to center the `other` vector by subtracting the global centroid
      * before calling this method.
      */
-    public float decodedCosine(byte[] encoded, float[] other) {
-        float sum = 0.0f;
-        float aMagnitude = 0.0f;
-        float bMagnitude = 0.0f;
+    public float decodedDotProduct(byte[] encoded, float[] other) {
+        var a = scratch.get();
         for (int m = 0; m < M; ++m) {
             int offset = subvectorSizesAndOffsets[m][1];
             int centroidIndex = Byte.toUnsignedInt(encoded[m]);
             float[] centroidSubvector = codebooks[m][centroidIndex];
-            var length = centroidSubvector.length;
-            sum += VectorUtil.dotProduct(centroidSubvector, 0, other, offset, length);
-            aMagnitude += VectorUtil.dotProduct(centroidSubvector, 0, centroidSubvector, 0, length);
-            bMagnitude +=  VectorUtil.dotProduct(other, offset, other, offset, length);
+            a[m] = VectorUtil.dotProduct(centroidSubvector, 0, other, offset, centroidSubvector.length);
         }
+        return VectorUtil.sum(a);
+    }
 
-        return (float) (sum / Math.sqrt(aMagnitude * bMagnitude));
+    /**
+     * Computes the square distance of the (approximate) original decoded vector with
+     * another vector.
+     * <p>
+     * This method can compute the square distance without materializing the decoded vector as a new float[],
+     * which will be roughly 2x as fast as decode() + squaredistance().
+     * <p>
+     * It is the caller's responsibility to center the `other` vector by subtracting the global centroid
+     * before calling this method.
+     */
+    public float decodedSquareDistance(byte[] encoded, float[] other) {
+        float sum = 0.0f;
+        var a = scratch.get();
+        for (int m = 0; m < M; ++m) {
+            int offset = subvectorSizesAndOffsets[m][1];
+            int centroidIndex = Byte.toUnsignedInt(encoded[m]);
+            float[] centroidSubvector = codebooks[m][centroidIndex];
+            a[m] = VectorUtil.squareDistance(centroidSubvector, 0, other, offset, centroidSubvector.length);
+        }
+        return VectorUtil.sum(a);
     }
 
     /**
@@ -167,7 +182,7 @@ public class ProductQuantization {
     /**
      * Decodes the quantized representation (byte array) to its approximate original vector, relative to the global centroid.
      */
-    void decodeCentered(byte[] encoded, float[] target) {
+    public void decodeCentered(byte[] encoded, float[] target) {
         for (int m = 0; m < M; m++) {
             int centroidIndex = Byte.toUnsignedInt(encoded[m]);
             float[] centroidSubvector = codebooks[m][centroidIndex];
@@ -212,15 +227,15 @@ public class ProductQuantization {
     }
 
     static float[][][] createCodebooks(List<float[]> vectors, int M, int[][] subvectorSizeAndOffset) {
-        return PhysicalCoreExecutor.instance.submit(() -> IntStream.range(0, M).parallel()
+        return IntStream.range(0, M).parallel()
                 .mapToObj(m -> {
                     float[][] subvectors = vectors.stream().parallel()
                             .map(vector -> getSubVector(vector, m, subvectorSizeAndOffset))
-                            .toArray(float[][]::new);
+                            .toArray(s -> new float[s][]);
                     var clusterer = new KMeansPlusPlusClusterer(subvectors, CLUSTERS, VectorUtil::squareDistance);
                     return clusterer.cluster(K_MEANS_ITERATIONS);
                 })
-                .toArray(float[][][]::new));
+                .toArray(s -> new float[s][][]);
     }
     
     static int closetCentroidIndex(float[] subvector, float[][] codebook) {
@@ -346,14 +361,5 @@ public class ProductQuantization {
 
     public float[] getCenter() {
         return globalCentroid;
-    }
-
-    public long memorySize() {
-        long size = 0;
-        for (int i = 0; i < codebooks.length; i++)
-            for (int j = 0; j < codebooks[i].length; j++)
-                size += RamUsageEstimator.sizeOf(codebooks[i][j]);
-
-        return size;
     }
 }

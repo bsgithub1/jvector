@@ -226,15 +226,7 @@ public final class VectorUtil {
     impl.addInPlace(v1, v2);
   }
 
-  public static void subInPlace(float[] v1, float[] v2) {
-    impl.subInPlace(v1, v2);
-  }
-
-
   public static float[] sub(float[] lhs, float[] rhs) {
     return impl.sub(lhs, rhs);
-  }
-  public static float assembleAndSum(float[] data, int dataBase, byte[] dataOffsets) {
-    return impl.assembleAndSum(data, dataBase, dataOffsets);
   }
 }
