@@ -1,10 +1,10 @@
 # JVector 
-JVector is a pure Java embedded vector search engine, used by [DataStax Astra DB](https://www.datastax.com/products/datastax-astra) and (soon) Apache Cassandra.
+JVector is a pure Java, zero dependency, embedded vector search engine, used by DataStax Astra DB and (soon) Apache Cassandra.
 
 What is JVector?
-- Algorithmic-fast. JVector uses state of the art graph algorithms inspired by DiskANN and related research that offer high recall and low latency.
+- Algorithmic-fast. JVector uses dstate of the art graph algorithms inspired by DiskANN and related research that offer high recall and low latency.
 - Implementation-fast. JVector uses the Panama SIMD API to accelerate index build and queries.
-- Memory efficient. JVector compresses vectors using product quantization so they can stay in memory during searches.  (As part of our PQ implementation, our SIMD-accelerated kmeans class is 5x faster than the one in Apache Commons Math.)
+- Memory efficient. JVector compresses vectors using product quantization so they can stay in memory during searches.  (As part of our PQ implementation, our SIMD-accelerated kmeans implementation is 3x faster than Apache Commons Math.)
 - Disk-aware. JVector’s disk layout is designed to do the minimum necessary iops at query time.
 - Concurrent.  Index builds scale linearly to at least 32 threads.  Double the threads, half the build time.
 - Incremental. Query your index as you build it.  No delay between adding a vector and being able to find it in search results.
@@ -13,14 +13,13 @@ What is JVector?
 
 ## JVector performance, visualized
 JVector vs Lucene searching the Deep100M dataset (about 35GB of vectors and 25GB index):
-![Screenshot from 2023-09-29 16-39-33](https://github.com/jbellis/jvector/assets/42158/7710f33d-ff6a-4282-9e31-4a5eaacd796f)
+![Screenshot from 2023-09-14 18-06-26](https://github.com/jbellis/jvector/assets/42158/217f43aa-9a7e-4f77-b32d-9b9d736af179)
 
 JVector scales updates linearly to at least 32 threads:
 ![Screenshot from 2023-09-14 18-05-15](https://github.com/jbellis/jvector/assets/42158/f0127bfc-6c45-48b9-96ea-95b2120da0d9)
 
 ## JVector basics
-Adding to your project. Replace `${latest-version}` with ![Maven Central](https://img.shields.io/maven-central/v/io.github.jbellis/jvector?color=green). Example `<version>1.0.1</version>`:
-
+Adding to your project. Replace `${latest-version}` with ![Maven Central](https://img.shields.io/maven-central/v/io.github.jbellis/jvector?color=green). Example `<version>1.0.0</version>`:
 ```
 <dependency>        
     <groupId>io.github.jbellis</groupId>          
@@ -29,7 +28,6 @@ Adding to your project. Replace `${latest-version}` with ![Maven Central](https:
     <version>${latest-version}</version>
 </dependency>
 ```
-
 Building the index:
 - [`GraphIndexBuilder`](./jvector-base/src/main/java/io/github/jbellis/jvector/graph/GraphIndexBuilder.java) is the entry point for building a graph.  You will need to implement
   [`RandomAccessVectorValues`](./jvector-base/src/main/java/io/github/jbellis/jvector/graph/RandomAccessVectorValues.java) to provide vectors to the builder;
@@ -43,7 +41,6 @@ Building the index:
   optimize the index and make it ready to write to disk.  (Graphs that are
   in the process of being built can be searched at any time; you do not have to call
   *complete* first.)
-
 Searching the index:
 - [`GraphSearcher`](./jvector-base/src/main/java/io/github/jbellis/jvector/graph/GraphSearcher.java) is the entry point for searching.  Results come back as a [`SearchResult`](./jvector-base/src/main/java/io/github/jbellis/jvector/graph/SearchResult.java) object that contains node IDs and scores, in
   descending order of similarity to the query vector.  `GraphSearcher` objects are re-usable,
@@ -60,9 +57,9 @@ JVector implements [DiskANN](https://suhasjs.github.io/files/diskann_neurips19.p
 search, meaning that vectors can be compressed using product quantization so that searches
 can be performed using the compressed representation that is kept in memory.  You can enable
 this with the following steps:
-- Create a [`ProductQuantization`](./jvector-base/src/main/java/io/github/jbellis/jvector/pq/ProductQuantization.java) object with your vectors using `ProductQuantization.compute`.  This will take some time
+- Create a [`ProductQuantization`](./jvector-base/src/main/java/io/github/jbellis/jvector/pq/ProductQuantization.java) object with your vectors.  This will take some time
   to compute the codebooks.
-- Use `ProductQuantization::encode` or `encodeAll` to encode your vectors.
+- Use `ProductQuantization.encode` or `encodeAll` to encode your vectors.
 - Create a [`CompressedVectors`](./jvector-base/src/main/java/io/github/jbellis/jvector/disk/CompressedVectors.java) object from the encoded vectors.
 - Create a [`NeighborSimilarity.ApproximateScoreFunction`](./jvector-base/src/main/java/io/github/jbellis/jvector/graph/NeighborSimilarity.java) for your query that uses the
   `ProductQuantization` object and `CompressedVectors` to compute scores, and pass this
@@ -72,21 +69,13 @@ this with the following steps:
 - [`OnDiskGraphIndex`](./jvector-base/src/main/java/io/github/jbellis/jvector/disk/OnDiskGraphIndex.java) and [`CompressedVectors`](./jvector-base/src/main/java/io/github/jbellis/jvector/disk/CompressedVectors.java) have `write()` methods to save state to disk.
   They initialize from disk using their constructor and `load()` methods, respectively.
   Writing just requires a DataOutput, but reading requires an 
-  implementation of [`RandomAccessReader`](./jvector-base/src/main/java/io/github/jbellis/jvector/disk/RandomAccessReader.java) and the related `ReaderSupplier` to wrap your
-  preferred i/o class for best performance. See `SimpleMappedReader` and `SimpleMappedReaderSupplier` for an example.
+  implementation of [`RandomAccessReader`](./jvector-base/src/main/java/io/github/jbellis/jvector/disk/RandomAccessReader.java) to wrap your
+  preferred i/o class for best performance. See MappedRandomAccessReader for an example.
 - Building a graph does not technically require your RandomAccessVectorValues object
   to live in memory, but it will perform much better if it does.  OnDiskGraphIndex,
   by contrast, is designed to live on disk and use minimal memory otherwise.
 - You can optionally wrap `OnDiskGraphIndex` in a [`CachingGraphIndex`](./jvector-base/src/main/java/io/github/jbellis/jvector/disk/CachingGraphIndex.java) to keep the most commonly accessed
   nodes (the ones nearest to the graph entry point) in memory.
-
-## Advanced configuration
-
-- JVector heavily utilizes the Panama Vector API(SIMD) for ANN indexing and search.  We have seen cases where the memory 
-bandwidth is saturated during indexing and product quantization and can cause the process to slow down. To avoid 
-this, index and PQ builds use a [`PhysicalCoreExecutor`](./jvector-base/src/main/java/io/github/jbellis/jvector/util/PhysicalCoreExecutor.java) 
-to limit the amount of operations to the physical core count. The default value is 1/2 the processor count seen by Java.
-This may not be correct in all setups (e.g. no hyperthreading or hybrid architectures) so if you wish to override the default use the `-Djvector.physical_core_count` property. 
 
 ## Sample code
 - The [`SiftSmall`](./jvector-examples/src/main/java/io/github/jbellis/jvector/example/SiftSmall.java) class demonstrates how to put all of the above together to index and search the
