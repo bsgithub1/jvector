@@ -52,7 +52,7 @@ public class ConcurrentNeighborSet {
     this.nodeId = nodeId;
     this.maxConnections = maxConnections;
     this.similarity = similarity;
-    neighborsRef = new AtomicReference<>(new ConcurrentNeighborArray(maxConnections));
+    neighborsRef = new AtomicReference<>(new ConcurrentNeighborArray(maxConnections, true));
     this.alpha = alpha;
   }
 
@@ -138,6 +138,8 @@ public class ConcurrentNeighborSet {
     if (natural.size() == 0 && concurrent.size() == 0) {
       return;
     }
+    assert natural.scoresDescOrder;
+    assert concurrent.scoresDescOrder;
 
     neighborsRef.getAndUpdate(current -> {
       // merge all the candidates into a single array and compute the diverse ones to keep
@@ -156,7 +158,7 @@ public class ConcurrentNeighborSet {
    * Copies the selected neighbors from the merged array into a new array.
    */
   private ConcurrentNeighborArray copyDiverse(NeighborArray merged, BitSet selected) {
-    ConcurrentNeighborArray next = new ConcurrentNeighborArray(maxConnections);
+    ConcurrentNeighborArray next = new ConcurrentNeighborArray(maxConnections, true);
     for (int i = 0; i < merged.size(); i++) {
       if (!selected.get(i)) {
         continue;
@@ -205,7 +207,10 @@ public class ConcurrentNeighborSet {
   }
 
   static ConcurrentNeighborArray mergeNeighbors(NeighborArray a1, NeighborArray a2) {
-    ConcurrentNeighborArray merged = new ConcurrentNeighborArray(a1.size() + a2.size());
+    assert a1.scoresDescOrder;
+    assert a2.scoresDescOrder;
+
+    ConcurrentNeighborArray merged = new ConcurrentNeighborArray(a1.size() + a2.size(), true);
     int i = 0, j = 0;
 
     while (i < a1.size() && j < a2.size()) {
@@ -325,8 +330,8 @@ public class ConcurrentNeighborSet {
 
   /** A NeighborArray that knows how to copy itself and that checks for duplicate entries */
   static class ConcurrentNeighborArray extends NeighborArray {
-    public ConcurrentNeighborArray(int maxSize) {
-      super(maxSize);
+    public ConcurrentNeighborArray(int maxSize, boolean descOrder) {
+      super(maxSize, descOrder);
     }
 
     // two nodes may attempt to add each other in the Concurrent classes,
@@ -337,7 +342,10 @@ public class ConcurrentNeighborSet {
       if (size == node.length) {
         growArrays();
       }
-      int insertionPoint = descSortFindRightMostInsertionPoint(newScore);
+      int insertionPoint =
+          scoresDescOrder
+              ? descSortFindRightMostInsertionPoint(newScore)
+              : ascSortFindRightMostInsertionPoint(newScore);
       if (!duplicateExistsNear(insertionPoint, newNode, newScore)) {
         System.arraycopy(node, insertionPoint, node, insertionPoint + 1, size - insertionPoint);
         System.arraycopy(score, insertionPoint, score, insertionPoint + 1, size - insertionPoint);
@@ -393,7 +401,7 @@ public class ConcurrentNeighborSet {
     }
 
     public ConcurrentNeighborArray copy() {
-      ConcurrentNeighborArray copy = new ConcurrentNeighborArray(node.length);
+      ConcurrentNeighborArray copy = new ConcurrentNeighborArray(node.length, scoresDescOrder);
       copy.size = size;
       System.arraycopy(node, 0, copy.node, 0, size);
       System.arraycopy(score, 0, copy.score, 0, size);

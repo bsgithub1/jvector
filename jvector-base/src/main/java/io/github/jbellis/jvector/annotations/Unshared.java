@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package io.github.jbellis.jvector.vector;
+package io.github.jbellis.jvector.annotations;
 
-public class PanamaVectorizationProvider extends VectorizationProvider
-{
-    private final VectorUtilSupport vectorUtilSupport;
+import java.lang.annotation.*;
 
-    public PanamaVectorizationProvider() {
-        this.vectorUtilSupport = new PanamaVectorUtilSupport();
-    }
-
-    @Override
-    public VectorUtilSupport getVectorUtilSupport()
-    {
-        return vectorUtilSupport;
-    }
+/**
+ * Type uses marked Unshared indicate an Object that will not be reused across returning method invocations.
+ * Counterpart of Shared.
+ */
+@Documented
+@Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.TYPE_USE) // TYPE_USE used instead of METHOD as the annotation travels better in some tooling
+public @interface Unshared {
 }

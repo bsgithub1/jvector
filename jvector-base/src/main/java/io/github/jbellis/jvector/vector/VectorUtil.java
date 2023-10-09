@@ -95,15 +95,6 @@ public final class VectorUtil {
     return r;
   }
 
-  /**
-   * Returns the sum of squared differences of the two vectors, or subvectors, of the given length.
-   */
-  public static float squareDistance(float[] a, int aoffset, float[] b, int boffset, int length) {
-    float r = impl.squareDistance(a, aoffset, b, boffset, length);
-    assert Float.isFinite(r);
-    return r;
-  }
-
   /** Returns the sum of squared differences of the two vectors. */
   public static int squareDistance(byte[] a, byte[] b) {
     if (a.length != b.length) {
@@ -226,15 +217,7 @@ public final class VectorUtil {
     impl.addInPlace(v1, v2);
   }
 
-  public static void subInPlace(float[] v1, float[] v2) {
-    impl.subInPlace(v1, v2);
-  }
-
-
   public static float[] sub(float[] lhs, float[] rhs) {
     return impl.sub(lhs, rhs);
-  }
-  public static float assembleAndSum(float[] data, int dataBase, byte[] dataOffsets) {
-    return impl.assembleAndSum(data, dataBase, dataOffsets);
   }
 }
