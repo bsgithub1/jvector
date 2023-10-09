@@ -21,6 +21,8 @@ import io.github.jbellis.jvector.TestUtil;
 import io.github.jbellis.jvector.disk.CachingGraphIndex;
 import io.github.jbellis.jvector.disk.OnDiskGraphIndex;
 import io.github.jbellis.jvector.disk.SimpleMappedReader;
+import io.github.jbellis.jvector.vector.types.VectorFloat;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,8 +38,8 @@ public class TestOnDiskGraphIndex extends RandomizedTest {
 
     private Path testDirectory;
 
-    private TestUtil.FullyConnectedGraphIndex<float[]> fullyConnectedGraph;
-    private TestUtil.RandomlyConnectedGraphIndex<float[]> randomlyConnectedGraph;
+    private TestUtil.FullyConnectedGraphIndex<VectorFloat<?>> fullyConnectedGraph;
+    private TestUtil.RandomlyConnectedGraphIndex<VectorFloat<?>> randomlyConnectedGraph;
 
     @Before
     public void setup() throws IOException {
@@ -51,7 +53,7 @@ public class TestOnDiskGraphIndex extends RandomizedTest {
         TestUtil.deleteQuietly(testDirectory);
     }
 
-    private static <T> void validateGraph(GraphIndex.View<T> expectedView, GraphIndex.View<T> actualView) {
+    private <T> void validateGraph(GraphIndex.View<T> expectedView, GraphIndex.View<T> actualView) throws Exception {
         assertEquals(expectedView.size(), actualView.size());
         assertEquals(expectedView.entryNode(), actualView.entryNode());
 
@@ -70,47 +72,42 @@ public class TestOnDiskGraphIndex extends RandomizedTest {
         }
     }
 
-    @Test
-    public void testSimpleGraphs() throws Exception {
-        for (var graph : List.of(fullyConnectedGraph, randomlyConnectedGraph))
+    private static <T> void writeGraph(GraphIndex<T> graph, RandomAccessVectorValues<T> vectors, Path outputPath) throws IOException {
+        try (var indexOutputWriter = TestUtil.openFileForWriting(outputPath))
         {
-            var outputPath = testDirectory.resolve("test_graph_" + graph.getClass().getSimpleName());
-            var ravv = new GraphIndexTestCase.CircularFloatVectorValues(graph.size());
-            TestUtil.writeGraph(graph, ravv, outputPath);
-            try (var marr = new SimpleMappedReader(outputPath.toAbsolutePath().toString());
-                 var onDiskGraph = new OnDiskGraphIndex<float[]>(marr::duplicate, 0);
-                 var onDiskView = onDiskGraph.getView())
-            {
-                validateGraph(graph.getView(), onDiskView);
-                validateVectors(onDiskView, ravv);
-            }
+            OnDiskGraphIndex.write(graph, vectors, indexOutputWriter);
+            indexOutputWriter.flush();
         }
     }
 
-    private static void validateVectors(GraphIndex.View<float[]> view, RandomAccessVectorValues<float[]> ravv) {
-        for (int i = 0; i < view.size(); i++) {
-            assertArrayEquals(view.getVector(i), ravv.vectorValue(i), 0.0f);
+    @Test
+    public void testSimpleGraphs() throws Exception {
+        for (var g : List.of(fullyConnectedGraph, randomlyConnectedGraph))
+        {
+            var outputPath = testDirectory.resolve("test_graph_" + g.getClass().getSimpleName());
+            writeGraph(g, new GraphIndexTestCase.CircularFloatVectorValues(g.size()), outputPath);
+            try (var marr = new SimpleMappedReader(outputPath.toAbsolutePath().toString());
+                 var onDiskGraph = new OnDiskGraphIndex<VectorFloat<?>>(marr::duplicate, 0);
+                 var onDiskView = onDiskGraph.getView())
+            {
+                validateGraph(g.getView(), onDiskView);
+            }
         }
     }
 
     @Test
     public void testLargeGraph() throws Exception
     {
-        var graph = new TestUtil.RandomlyConnectedGraphIndex<float[]>(100_000, 16, getRandom());
+        var graph = new TestUtil.RandomlyConnectedGraphIndex<VectorFloat<?>>(100_000, 16, getRandom());
         var outputPath = testDirectory.resolve("large_graph");
-        var ravv = new GraphIndexTestCase.CircularFloatVectorValues(graph.size());
-        TestUtil.writeGraph(graph, ravv, outputPath);
+        writeGraph(graph, new GraphIndexTestCase.CircularFloatVectorValues(graph.size()), outputPath);
 
         try (var marr = new SimpleMappedReader(outputPath.toAbsolutePath().toString());
-             var onDiskGraph = new OnDiskGraphIndex<float[]>(marr::duplicate, 0);
-             var onDiskView = onDiskGraph.getView();
-             var cachedOnDiskGraph = new CachingGraphIndex(onDiskGraph);
-             var cachedOnDiskView = cachedOnDiskGraph.getView())
+             var onDiskGraph = new OnDiskGraphIndex<VectorFloat<?>>(marr::duplicate, 0);
+             var onDiskView = onDiskGraph.getView())
         {
             validateGraph(graph.getView(), onDiskView);
-            validateGraph(graph.getView(), cachedOnDiskView);
-            validateVectors(onDiskView, ravv);
-            validateVectors(cachedOnDiskView, ravv);
+            validateGraph(graph.getView(), new CachingGraphIndex(onDiskGraph).getView());
         }
     }
 }

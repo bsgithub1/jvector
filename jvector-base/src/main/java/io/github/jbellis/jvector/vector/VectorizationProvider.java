@@ -31,6 +31,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+import io.github.jbellis.jvector.vector.types.VectorTypeSupport;
+
 
 /**
  * A provider of vectorization implementations. Depending on the Java version and availability of
@@ -58,9 +60,15 @@ public abstract class VectorizationProvider {
    */
   public abstract VectorUtilSupport getVectorUtilSupport();
 
+  /**
+   * Returns a singleton (stateless) {@link VectorTypeSupport} which works with the corresponding {@link VectorUtilSupport}
+   * implementation
+   */
+  public abstract VectorTypeSupport getVectorTypeSupport();
+
   // *** Lookup mechanism: ***
 
-  protected static final Logger LOG = Logger.getLogger(VectorizationProvider.class.getName());
+  private static final Logger LOG = Logger.getLogger(VectorizationProvider.class.getName());
 
   /** The minimal version of Java that has the bugfix for JDK-8301190. */
   private static final Version VERSION_JDK8301190_FIXED = Version.parse("20.0.2");
@@ -87,6 +95,21 @@ public abstract class VectorizationProvider {
         LOG.warning("C2 compiler is disabled; Java vector incubator API can't be enabled");
         return new DefaultVectorizationProvider();
       }
+
+      try {
+        var provider = (VectorizationProvider) Class.forName("io.github.jbellis.jvector.vector.NativeVectorizationProvider").getConstructor().newInstance();
+        LOG.info("Native Vector API enabled. Using NativeVectorizationProvider.");
+        return provider;
+      } catch (UnsupportedOperationException uoe) {
+        // not supported because preferred vector size too small or similar
+        LOG.warning("Java vector API was not enabled. " + uoe.getMessage());
+        return new DefaultVectorizationProvider();
+      } catch (ClassNotFoundException e) {
+        LOG.warning("Java version does not support vector API");
+      } catch (Throwable th) {
+        throw new AssertionError(th);
+      }
+
       try {
         var provider = (VectorizationProvider) Class.forName("io.github.jbellis.jvector.vector.PanamaVectorizationProvider").getConstructor().newInstance();
         LOG.info("Java incubating Vector API enabled. Using PanamaVectorizationProvider.");
@@ -152,6 +175,6 @@ public abstract class VectorizationProvider {
   private static final class Holder {
     private Holder() {}
 
-    static final VectorizationProvider INSTANCE = lookup(false);
+    static final VectorizationProvider INSTANCE = lookup(true);
   }
 }
