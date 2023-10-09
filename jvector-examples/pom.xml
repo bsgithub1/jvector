@@ -121,7 +121,7 @@
                                         <argument>-classpath</argument>
                                         <classpath/>
                                         <argument>--add-modules=jdk.incubator.vector</argument>
-                                        <argument>-Xmx12G</argument>
+                                        <argument>-Xmx32G</argument>
                                         <argument>-ea</argument>
                                         <argument>io.github.jbellis.jvector.example.Bench</argument>
                                     </arguments>
