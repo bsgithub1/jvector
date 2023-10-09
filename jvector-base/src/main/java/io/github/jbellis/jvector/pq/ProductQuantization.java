@@ -19,8 +19,6 @@ package io.github.jbellis.jvector.pq;
 import io.github.jbellis.jvector.disk.Io;
 import io.github.jbellis.jvector.disk.RandomAccessReader;
 import io.github.jbellis.jvector.graph.RandomAccessVectorValues;
-import io.github.jbellis.jvector.util.RamUsageEstimator;
-import io.github.jbellis.jvector.util.PhysicalCoreExecutor;
 import io.github.jbellis.jvector.vector.VectorUtil;
 
 import java.io.DataOutput;
@@ -40,8 +38,8 @@ import static java.lang.Math.min;
  */
 public class ProductQuantization {
     static final int CLUSTERS = 256; // number of clusters per subspace = one byte's worth
-    private static final int K_MEANS_ITERATIONS = 6;
-    private static final int MAX_PQ_TRAINING_SET_SIZE = 128000;
+    private static final int K_MEANS_ITERATIONS = 12;
+    private static final int MAX_PQ_TRAINING_SET_SIZE = 256000;
 
     final float[][][] codebooks;
     final int M;
@@ -74,8 +72,7 @@ public class ProductQuantization {
         if (globallyCenter) {
             globalCentroid = KMeansPlusPlusClusterer.centroidOf(vectors);
             // subtract the centroid from each vector
-            List<float[]> finalVectors = vectors;
-            vectors = PhysicalCoreExecutor.instance.submit(() -> finalVectors.stream().parallel().map(v -> VectorUtil.sub(v, globalCentroid)).collect(Collectors.toList()));
+            vectors = vectors.stream().parallel().map(v -> VectorUtil.sub(v, globalCentroid)).collect(Collectors.toList());
         } else {
             globalCentroid = null;
         }
@@ -103,8 +100,8 @@ public class ProductQuantization {
     /**
      * Encodes the given vectors in parallel using the PQ codebooks.
      */
-    public byte[][] encodeAll(List<float[]> vectors) {
-        return PhysicalCoreExecutor.instance.submit(() ->vectors.stream().parallel().map(this::encode).toArray(byte[][]::new));
+    public List<byte[]> encodeAll(List<float[]> vectors) {
+        return vectors.stream().parallel().map(this::encode).collect(Collectors.toList());
     }
 
     /**
@@ -212,15 +209,15 @@ public class ProductQuantization {
     }
 
     static float[][][] createCodebooks(List<float[]> vectors, int M, int[][] subvectorSizeAndOffset) {
-        return PhysicalCoreExecutor.instance.submit(() -> IntStream.range(0, M).parallel()
+        return IntStream.range(0, M).parallel()
                 .mapToObj(m -> {
                     float[][] subvectors = vectors.stream().parallel()
                             .map(vector -> getSubVector(vector, m, subvectorSizeAndOffset))
-                            .toArray(float[][]::new);
+                            .toArray(s -> new float[s][]);
                     var clusterer = new KMeansPlusPlusClusterer(subvectors, CLUSTERS, VectorUtil::squareDistance);
                     return clusterer.cluster(K_MEANS_ITERATIONS);
                 })
-                .toArray(float[][][]::new));
+                .toArray(s -> new float[s][][]);
     }
     
     static int closetCentroidIndex(float[] subvector, float[][] codebook) {
@@ -346,14 +343,5 @@ public class ProductQuantization {
 
     public float[] getCenter() {
         return globalCentroid;
-    }
-
-    public long memorySize() {
-        long size = 0;
-        for (int i = 0; i < codebooks.length; i++)
-            for (int j = 0; j < codebooks[i].length; j++)
-                size += RamUsageEstimator.sizeOf(codebooks[i][j]);
-
-        return size;
     }
 }
