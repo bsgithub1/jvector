@@ -19,22 +19,23 @@ package io.github.jbellis.jvector.disk;
 import io.github.jbellis.jvector.graph.GraphIndex;
 import io.github.jbellis.jvector.graph.NodesIterator;
 import io.github.jbellis.jvector.util.Accountable;
+import io.github.jbellis.jvector.vector.types.VectorFloat;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
-public class CachingGraphIndex implements GraphIndex<float[]>, AutoCloseable, Accountable
+public class CachingGraphIndex implements GraphIndex<VectorFloat<?>>, AutoCloseable, Accountable
 {
-    private static final int CACHE_DISTANCE = 3;
+    private static final int BFS_DISTANCE = 3;
 
     private final GraphCache cache;
-    private final OnDiskGraphIndex<float[]> graph;
+    private final OnDiskGraphIndex<VectorFloat<?>> graph;
 
-    public CachingGraphIndex(OnDiskGraphIndex<float[]> graph)
+    public CachingGraphIndex(OnDiskGraphIndex<VectorFloat<?>> graph)
     {
         this.graph = graph;
         try {
-            this.cache = GraphCache.load(graph, CACHE_DISTANCE);
+            this.cache = GraphCache.load(graph, BFS_DISTANCE);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -51,13 +52,13 @@ public class CachingGraphIndex implements GraphIndex<float[]>, AutoCloseable, Ac
     }
 
     @Override
-    public View<float[]> getView() {
+    public View<VectorFloat<?>> getView() {
         return new CachedView(graph.getView());
     }
 
     @Override
-    public int maxDegree() {
-        return graph.maxDegree();
+    public int maxEdgesPerNode() {
+        return graph.maxEdgesPerNode();
     }
 
     @Override
@@ -70,10 +71,10 @@ public class CachingGraphIndex implements GraphIndex<float[]>, AutoCloseable, Ac
         graph.close();
     }
 
-    private class CachedView implements View<float[]> {
-        private final View<float[]> view;
+    private class CachedView implements View<VectorFloat<?>> {
+        private final View<VectorFloat<?>> view;
 
-        public CachedView(View<float[]> view) {
+        public CachedView(View<VectorFloat<?>> view) {
             this.view = view;
         }
 
@@ -87,7 +88,7 @@ public class CachingGraphIndex implements GraphIndex<float[]>, AutoCloseable, Ac
         }
 
         @Override
-        public float[] getVector(int node) {
+        public VectorFloat<?> getVector(int node) {
             var cached = cache.getNode(node);
             if (cached != null) {
                 return cached.vector;

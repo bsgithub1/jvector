@@ -27,6 +27,8 @@ package io.github.jbellis.jvector.graph;
 import io.github.jbellis.jvector.util.*;
 import io.github.jbellis.jvector.vector.VectorEncoding;
 import io.github.jbellis.jvector.vector.VectorSimilarityFunction;
+import io.github.jbellis.jvector.vector.types.VectorByte;
+import io.github.jbellis.jvector.vector.types.VectorFloat;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -69,9 +71,9 @@ public class GraphSearcher<T> {
     NeighborSimilarity.ExactScoreFunction scoreFunction = i -> {
       switch (vectorEncoding) {
         case BYTE:
-          return similarityFunction.compare((byte[]) targetVector, (byte[]) vectors.vectorValue(i));
+          return similarityFunction.compare((VectorByte<?>) targetVector, (VectorByte<?>) vectors.vectorValue(i));
         case FLOAT32:
-          return similarityFunction.compare((float[]) targetVector, (float[]) vectors.vectorValue(i));
+          return similarityFunction.compare((VectorFloat<?>) targetVector, (VectorFloat<?>) vectors.vectorValue(i));
         default:
           throw new RuntimeException("Unsupported vector encoding: " + vectorEncoding);
       }
@@ -99,17 +101,6 @@ public class GraphSearcher<T> {
     }
   }
 
-  /**
-   * @param scoreFunction a function returning the similarity of a given node to the query vector
-   * @param reRanker if scoreFunction is approximate, this should be non-null and perform exact
-   *                 comparisons of the vectors for re-ranking at the end of the search.
-   * @param topK the number of results to look for
-   * @param acceptOrds a Bits instance indicating which nodes are acceptable results.
-   *                   If null, all nodes are acceptable.
-   *                   It is caller's responsibility to ensure that there are enough acceptable nodes
-   *                   that we don't search the entire graph trying to satisfy topK.
-   * @return a SearchResult containing the topK results and the number of nodes visited during the search.
-   */
   public SearchResult search(
       NeighborSimilarity.ScoreFunction scoreFunction,
       NeighborSimilarity.ReRanker<T> reRanker,
@@ -144,7 +135,7 @@ public class GraphSearcher<T> {
 
     prepareScratchState(view.size());
     var resultsQueue = new NeighborQueue(topK, false);
-    Map<Integer, T> vectorsEncountered = scoreFunction.isExact() ? null : new java.util.HashMap<>();
+    Map<Integer, T> vectorsEncountered = !scoreFunction.isExact() ? new java.util.HashMap<>() : null;
     int numVisited = 0;
 
     float score = scoreFunction.similarityTo(ep);
@@ -168,6 +159,8 @@ public class GraphSearcher<T> {
         break;
       }
 
+      // TODO should we merge getVector and getNeighborsIterator into a single method to
+      // be more aligned with how it works under the hood?
       int topCandidateNode = candidates.pop();
       if (!scoreFunction.isExact()) {
         vectorsEncountered.put(topCandidateNode, view.getVector(topCandidateNode));

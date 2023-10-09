@@ -17,24 +17,30 @@
 package io.github.jbellis.jvector.pq;
 
 import io.github.jbellis.jvector.vector.VectorUtil;
+import io.github.jbellis.jvector.vector.types.VectorFloat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
 
 /**
- * A KMeans++ implementation for float vectors.  Optimizes to use SIMD vector instructions if available.
+ * A KMeans++ implementation for float vectors.  Optimizes to use SIMD vector
+ * instructions, and to use the triangle inequality to skip distance calculations.
+ * Roughly 3x faster than using the apache commons math implementation (with
+ * conversions to double[]).
  */
 public class KMeansPlusPlusClusterer {
     private final int k;
-    private final BiFunction<float[], float[], Float> distanceFunction;
+    private final BiFunction<VectorFloat<?>, VectorFloat<?>, Float> distanceFunction;
     private final Random random;
-    private final float[][] points;
+    private final List<VectorFloat<?>>[] clusterPoints;
+    private final float[][] centroidDistances;
+    private final VectorFloat<?>[] points;
     private final int[] assignments;
-    private final float[][] centroids;
-    private final int[] centroidDenoms;
-    private final float[][] centroidNums;
+    private final VectorFloat<?>[] centroids;
+
 
     /**
      * Constructs a KMeansPlusPlusFloatClusterer with the specified number of clusters,
@@ -43,7 +49,7 @@ public class KMeansPlusPlusClusterer {
      * @param k number of clusters.
      * @param distanceFunction a function to compute the distance between two points.
      */
-    public KMeansPlusPlusClusterer(float[][] points, int k, BiFunction<float[], float[], Float> distanceFunction) {
+    public KMeansPlusPlusClusterer(VectorFloat<?>[] points, int k, BiFunction<VectorFloat<?>, VectorFloat<?>, Float> distanceFunction) {
         if (k <= 0) {
             throw new IllegalArgumentException("Number of clusters must be positive.");
         }
@@ -54,10 +60,14 @@ public class KMeansPlusPlusClusterer {
         this.points = points;
         this.k = k;
         this.distanceFunction = distanceFunction;
-        random = new Random();
-        centroidDenoms = new int[k];
-        centroidNums = new float[k][points[0].length];
+        this.random = new Random();
+        this.clusterPoints = new List[k];
+        for (int i = 0; i < k; i++) {
+            this.clusterPoints[i] = new ArrayList<>();
+        }
+        centroidDistances = new float[k][k];
         centroids = chooseInitialCentroids(points);
+        updateCentroidDistances();
         assignments = new int[points.length];
         assignPointsToClusters();
     }
@@ -65,9 +75,9 @@ public class KMeansPlusPlusClusterer {
     /**
      * Performs clustering on the provided set of points.
      *
-     * @return an array of cluster centroids.
+     * @return a list of cluster centroids.
      */
-    public float[][] cluster(int maxIterations) {
+    public VectorFloat<?>[] cluster(int maxIterations) {
         for (int i = 0; i < maxIterations; i++) {
             int changedCount = clusterOnce();
             if (changedCount <= 0.01 * points.length) {
@@ -79,28 +89,50 @@ public class KMeansPlusPlusClusterer {
 
     // This is broken out as a separate public method to allow implementing OPQ efficiently
     public int clusterOnce() {
-        updateCentroids();
-        return assignPointsToClusters();
+        for (int j = 0; j < k; j++) {
+            if (clusterPoints[j].isEmpty()) {
+                // Handle empty cluster by choosing a random point
+                // (Choosing the highest-variance point is much slower and no better after a couple iterations)
+                centroids[j] = points[random.nextInt(points.length)];
+            } else {
+                centroids[j] = centroidOf(clusterPoints[j]);
+            }
+        }
+        int changedCount = assignPointsToClusters();
+        updateCentroidDistances();
+
+        return changedCount;
+    }
+
+    private void updateCentroidDistances() {
+        for (int m = 0; m < k; m++) {
+            for (int n = m + 1; n < k; n++) {
+                float distance = distanceFunction.apply(centroids[m], centroids[n]);
+                centroidDistances[m][n] = distance;
+                centroidDistances[n][m] = distance; // Distance matrix is symmetric
+            }
+        }
     }
 
     /**
      * Chooses the initial centroids for clustering.
+     *
      * The first centroid is chosen randomly from the data points. Subsequent centroids
      * are selected with a probability proportional to the square of their distance
      * to the nearest existing centroid. This ensures that the centroids are spread out
      * across the data and not initialized too closely to each other, leading to better
      * convergence and potentially improved final clusterings.
-     *
+     * *
      * @param points a list of points from which centroids are chosen.
-     * @return an array of initial centroids.
+     * @return a list of initial centroids.
      */
-    private float[][] chooseInitialCentroids(float[][] points) {
-        float[][] centroids = new float[k][];
+    private VectorFloat<?>[] chooseInitialCentroids(VectorFloat<?>[] points) {
+        VectorFloat[] centroids = new VectorFloat<?>[k];
         float[] distances = new float[points.length];
         Arrays.fill(distances, Float.MAX_VALUE);
 
         // Choose the first centroid randomly
-        float[] firstCentroid = points[random.nextInt(points.length)];
+        VectorFloat<?> firstCentroid = points[random.nextInt(points.length)];
         centroids[0] = firstCentroid;
         for (int i = 0; i < points.length; i++) {
             float distance1 = distanceFunction.apply(points[i], firstCentroid);
@@ -128,7 +160,7 @@ public class KMeansPlusPlusClusterer {
                 selectedIdx = random.nextInt(points.length);
             }
 
-            float[] nextCentroid = points[selectedIdx];
+            VectorFloat<?> nextCentroid = points[selectedIdx];
             centroids[i] = nextCentroid;
 
             // Update distances, but only if the new centroid provides a closer distance
@@ -147,18 +179,21 @@ public class KMeansPlusPlusClusterer {
     private int assignPointsToClusters() {
         int changedCount = 0;
 
+        for (List<VectorFloat<?>> cluster : clusterPoints) {
+            cluster.clear();
+        }
+
         for (int i = 0; i < points.length; i++) {
-            float[] point = points[i];
-            var oldAssignment = assignments[i];
-            var newAssignment = getNearestCluster(point, centroids);
-            if (newAssignment != oldAssignment) {
-                centroidDenoms[oldAssignment] = centroidDenoms[oldAssignment] - 1;
-                centroidDenoms[newAssignment] = centroidDenoms[newAssignment] + 1;
-                VectorUtil.subInPlace(centroidNums[oldAssignment], point);
-                VectorUtil.addInPlace(centroidNums[newAssignment], point);
-                assignments[i] = newAssignment;
+            VectorFloat<?> point = points[i];
+            int clusterIndex = getNearestCluster(point, centroids);
+
+            // Check if assignment has changed
+            if (assignments[i] != clusterIndex) {
                 changedCount++;
             }
+
+            clusterPoints[clusterIndex].add(point);
+            assignments[i] = clusterIndex;
         }
 
         return changedCount;
@@ -167,11 +202,19 @@ public class KMeansPlusPlusClusterer {
     /**
      * Return the index of the closest centroid to the given point
      */
-    private int getNearestCluster(float[] point, float[][] centroids) {
+    private int getNearestCluster(VectorFloat<?> point, VectorFloat<?>[] centroids) {
         float minDistance = Float.MAX_VALUE;
         int nearestCluster = 0;
 
         for (int i = 0; i < k; i++) {
+            if (i != nearestCluster) {
+                // Using triangle inequality to potentially skip the computation
+                float potentialMinDistance = Math.abs(minDistance - centroidDistances[nearestCluster][i]);
+                if (potentialMinDistance >= minDistance) {
+                    continue;
+                }
+            }
+
             float distance = distanceFunction.apply(point, centroids[i]);
             if (distance < minDistance) {
                 minDistance = distance;
@@ -183,29 +226,14 @@ public class KMeansPlusPlusClusterer {
     }
 
     /**
-     * Calculates centroids from centroidNums/centroidDenoms updated during point assignment
-     */
-    private void updateCentroids() {
-        for (int i = 0; i < centroids.length; i++) {
-            var denom = centroidDenoms[i];
-            if (denom == 0) {
-                centroids[i] = points[random.nextInt(points.length)];
-            } else {
-                centroids[i] = Arrays.copyOf(centroidNums[i], centroidNums[i].length);
-                VectorUtil.divInPlace(centroids[i], centroidDenoms[i]);
-            }
-        }
-    }
-
-    /**
      * Computes the centroid of a list of points.
      */
-    public static float[] centroidOf(List<float[]> points) {
+    public static VectorFloat<?> centroidOf(List<VectorFloat<?>> points) {
         if (points.isEmpty()) {
             throw new IllegalArgumentException("Can't compute centroid of empty points list");
         }
 
-        float[] centroid = VectorUtil.sum(points);
+        VectorFloat<?> centroid = VectorUtil.sum(points);
         VectorUtil.divInPlace(centroid, points.size());
 
         return centroid;

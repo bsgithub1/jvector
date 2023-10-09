@@ -26,65 +26,51 @@ package io.github.jbellis.jvector.vector;
 
 import java.util.List;
 
+import io.github.jbellis.jvector.vector.types.VectorByte;
+import io.github.jbellis.jvector.vector.types.VectorFloat;
+
 /**
  * Interface for implementations of VectorUtil support.
  */
 public interface VectorUtilSupport {
 
   /** Calculates the dot product of the given float arrays. */
-  float dotProduct(float[] a, float[] b);
+  float dotProduct(VectorFloat<?> a, VectorFloat<?> b);
 
   /** Calculates the dot product of float arrays of differing sizes, or a subset of the data */
-  float dotProduct(float[] a, int aoffset, float[] b, int boffset, int length);
+  float dotProduct(VectorFloat<?> a, int aoffset, VectorFloat<?> b, int boffset, int length);
 
   /** Returns the cosine similarity between the two vectors. */
-  float cosine(float[] v1, float[] v2);
+  float cosine(VectorFloat<?> v1, VectorFloat<?> v2);
 
   /** Returns the sum of squared differences of the two vectors. */
-  float squareDistance(float[] a, float[] b);
+  float squareDistance(VectorFloat<?> a, VectorFloat<?> b);
 
   /** Calculates the sum of squared differences of float arrays of differing sizes, or a subset of the data */
-  float squareDistance(float[] a, int aoffset, float[] b, int boffset, int length);
+  float squareDistance(VectorFloat<?> a, int aoffset, VectorFloat<?> b, int boffset, int length);
 
   /** Returns the dot product computed over signed bytes. */
-  int dotProduct(byte[] a, byte[] b);
+  int dotProduct(VectorByte<?> a, VectorByte<?> b);
 
   /** Returns the cosine similarity between the two byte vectors. */
-  float cosine(byte[] a, byte[] b);
+  float cosine(VectorByte<?> a, VectorByte<?> b);
 
   /** Returns the sum of squared differences of the two byte vectors. */
-  int squareDistance(byte[] a, byte[] b);
+  int squareDistance(VectorByte<?> a, VectorByte<?> b);
+
 
   /** returns the sum of the given vectors. */
-  float[] sum(List<float[]> vectors);
+  VectorFloat<?> sum(List<VectorFloat<?>> vectors);
 
   /** return the sum of the components of the vector */
-  float sum(float[] vector);
+  float sum(VectorFloat<?> vector);
 
   /** Divide vector by divisor, in place (vector will be modified) */
-  void divInPlace(float[] vector, float divisor);
+  void divInPlace(VectorFloat<?> vector, float divisor);
 
   /** Adds v2 into v1, in place (v1 will be modified) */
-  public void addInPlace(float[] v1, float[] v2);
-
-  /** Subtracts v2 from v1, in place (v1 will be modified) */
-  public void subInPlace(float[] v1, float[] v2);
+  void addInPlace(VectorFloat<?> v1, VectorFloat<?> v2);
 
   /** @return lhs - rhs, element-wise */
-  public float[] sub(float[] lhs, float[] rhs);
-
-  /**
-   * Calculates the sum of sparse points in a vector.
-   *
-   * This assumes the data vector is a 2d matrix which has been flattened into 1 dimension
-   * so rather than data[n][m] it's data[n * m].  With this layout this method can quickly
-   * assemble the data from this heap and sum it.
-   *
-   * @param data the vector of all datapoints
-   * @param baseIndex the start of the data in the offset table
-   *                  (scaled by the index of the lookup table)
-   * @param baseOffsets bytes that represent offsets from the baseIndex
-   * @return the sum of the points
-   */
-  public float assembleAndSum(float[] data, int baseIndex, byte[] baseOffsets);
+  VectorFloat<?> sub(VectorFloat<?> lhs, VectorFloat<?> rhs);
 }

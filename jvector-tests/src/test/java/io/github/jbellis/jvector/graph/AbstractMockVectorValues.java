@@ -26,9 +26,11 @@ package io.github.jbellis.jvector.graph;
 
 import io.github.jbellis.jvector.util.BytesRef;
 import io.github.jbellis.jvector.util.DocIdSetIterator;
+import io.github.jbellis.jvector.vector.VectorizationProvider;
+import io.github.jbellis.jvector.vector.types.VectorTypeSupport;
 
 abstract class AbstractMockVectorValues<T> implements RandomAccessVectorValues<T> {
-
+  protected static final VectorTypeSupport vectorTypeSupport = VectorizationProvider.getInstance().getVectorTypeSupport();
   protected final int dimension;
   protected final T[] denseValues;
   protected final T[] values;
@@ -65,6 +67,14 @@ abstract class AbstractMockVectorValues<T> implements RandomAccessVectorValues<T
 
   @Override
   public T vectorValue(int targetOrd) {
+    if (callingThreadID < 0) {
+      callingThreadID = Thread.currentThread().getId();
+    }
+    if (callingThreadID != Thread.currentThread().getId()) {
+      throw new RuntimeException(
+          "RandomAccessVectorValues is not thread safe, but multiple calling threads detected");
+    }
+
     return denseValues[targetOrd];
   }
 

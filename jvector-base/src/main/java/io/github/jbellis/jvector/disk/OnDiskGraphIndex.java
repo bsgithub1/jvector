@@ -20,6 +20,9 @@ import io.github.jbellis.jvector.graph.GraphIndex;
 import io.github.jbellis.jvector.graph.NodesIterator;
 import io.github.jbellis.jvector.graph.RandomAccessVectorValues;
 import io.github.jbellis.jvector.util.Accountable;
+import io.github.jbellis.jvector.vector.VectorizationProvider;
+import io.github.jbellis.jvector.vector.types.VectorFloat;
+import io.github.jbellis.jvector.vector.types.VectorTypeSupport;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -27,11 +30,12 @@ import java.io.UncheckedIOException;
 
 public class OnDiskGraphIndex<T> implements GraphIndex<T>, AutoCloseable, Accountable
 {
+    private static final VectorTypeSupport vectorTypeSupport = VectorizationProvider.getInstance().getVectorTypeSupport();
     private final ReaderSupplier readerSupplier;
     private final long neighborsOffset;
     private final int size;
     private final int entryNode;
-    private final int maxDegree;
+    private final int M;
     private final int dimension;
 
     public OnDiskGraphIndex(ReaderSupplier readerSupplier, long offset)
@@ -43,7 +47,7 @@ public class OnDiskGraphIndex<T> implements GraphIndex<T>, AutoCloseable, Accoun
             size = reader.readInt();
             dimension = reader.readInt();
             entryNode = reader.readInt();
-            maxDegree = reader.readInt();
+            M = reader.readInt();
         } catch (Exception e) {
             throw new RuntimeException("Error initializing OnDiskGraph at offset " + offset, e);
         }
@@ -55,8 +59,8 @@ public class OnDiskGraphIndex<T> implements GraphIndex<T>, AutoCloseable, Accoun
     }
 
     @Override
-    public int maxDegree() {
-        return maxDegree;
+    public int maxEdgesPerNode() {
+        return M;
     }
 
     /** return a Graph that can be safely queried concurrently */
@@ -69,24 +73,20 @@ public class OnDiskGraphIndex<T> implements GraphIndex<T>, AutoCloseable, Accoun
     public class OnDiskView implements GraphIndex.View<T>, AutoCloseable
     {
         private final RandomAccessReader reader;
-        private final int[] neighbors;
 
         public OnDiskView(RandomAccessReader reader)
         {
             super();
             this.reader = reader;
-            this.neighbors = new int[maxDegree];
         }
 
         public T getVector(int node) {
             try {
                 long offset = neighborsOffset +
-                        node * (Integer.BYTES + (long) dimension * Float.BYTES + (long) Integer.BYTES * (maxDegree + 1)) // earlier entries
+                        node * (Integer.BYTES + (long) dimension * Float.BYTES + (long) Integer.BYTES * (M + 1)) // earlier entries
                         + Integer.BYTES; // skip the ID
-                float[] vector = new float[dimension];
                 reader.seek(offset);
-                reader.readFully(vector);
-                return (T) vector;
+                return (T) vectorTypeSupport.readFloatType(reader, dimension);
             }
             catch (IOException e) {
                 throw new UncheckedIOException(e);
@@ -97,11 +97,31 @@ public class OnDiskGraphIndex<T> implements GraphIndex<T>, AutoCloseable, Accoun
             try {
                 reader.seek(neighborsOffset +
                         (node + 1) * (Integer.BYTES + (long) dimension * Float.BYTES) +
-                        (node * (long) Integer.BYTES * (maxDegree + 1)));
+                        (node * (long) Integer.BYTES * (M + 1)));
                 int neighborCount = reader.readInt();
-                assert neighborCount <= maxDegree : String.format("neighborCount %d > M %d", neighborCount, maxDegree);
-                reader.read(neighbors, 0, neighborCount);
-                return new NodesIterator.ArrayNodesIterator(neighbors, neighborCount);
+                assert neighborCount <= M : String.format("neighborCount %d > M %d", neighborCount, M);
+                return new NodesIterator(neighborCount)
+                {
+                    int currentNeighborsRead = 0;
+
+                    @Override
+                    public int nextInt() {
+                        currentNeighborsRead++;
+                        try {
+                            int ordinal = reader.readInt();
+                            assert ordinal <= OnDiskGraphIndex.this.size : String.format("ordinal %d > size %d", ordinal, size);
+                            return ordinal;
+                        }
+                        catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    }
+
+                    @Override
+                    public boolean hasNext() {
+                        return currentNeighborsRead < neighborCount;
+                    }
+                };
             }
             catch (IOException e) {
                 throw new UncheckedIOException(e);
@@ -151,12 +171,12 @@ public class OnDiskGraphIndex<T> implements GraphIndex<T>, AutoCloseable, Accoun
         out.writeInt(graph.size());
         out.writeInt(vectors.dimension());
         out.writeInt(view.entryNode());
-        out.writeInt(graph.maxDegree());
+        out.writeInt(graph.maxEdgesPerNode());
 
         // for each graph node, write the associated vector and its neighbors
         for (int node = 0; node < graph.size(); node++) {
             out.writeInt(node); // unnecessary, but a reasonable sanity check
-            Io.writeFloats(out, (float[]) vectors.vectorValue(node));
+            vectorTypeSupport.writeFloatType(out, (VectorFloat<?>) vectors.vectorValue(node));
 
             var neighbors = view.getNeighborsIterator(node);
             out.writeInt(neighbors.size());
@@ -167,7 +187,7 @@ public class OnDiskGraphIndex<T> implements GraphIndex<T>, AutoCloseable, Accoun
             assert !neighbors.hasNext();
 
             // pad out to maxEdgesPerNode
-            for (; n < graph.maxDegree(); n++) {
+            for ( ; n < graph.maxEdgesPerNode(); n++) {
                 out.writeInt(-1);
             }
         }

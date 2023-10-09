@@ -18,87 +18,74 @@ package io.github.jbellis.jvector.vector;
 
 import java.util.List;
 
+import io.github.jbellis.jvector.vector.types.VectorByte;
+import io.github.jbellis.jvector.vector.types.VectorFloat;
+
 final class
-PanamaVectorUtilSupport implements VectorUtilSupport {
+PanamaVectorUtilSupport implements VectorUtilSupport
+{
     @Override
-    public float dotProduct(float[] a, float[] b) {
-        return SimdOps.dotProduct(a, b);
+    public float dotProduct(VectorFloat<?> a, VectorFloat<?> b) {
+        return SimdOps.dotProduct((ArrayVectorFloat)a, (ArrayVectorFloat)b);
     }
 
     @Override
-    public float cosine(float[] v1, float[] v2) {
-        return SimdOps.cosineSimilarity(v1, v2);
+    public float cosine(VectorFloat<?> v1, VectorFloat<?> v2) {
+        return SimdOps.cosineSimilarity((ArrayVectorFloat)v1, (ArrayVectorFloat)v2);
     }
 
     @Override
-    public float squareDistance(float[] a, float[] b) {
-        return SimdOps.squareDistance(a, b);
+    public float squareDistance(VectorFloat<?> a, VectorFloat<?> b) {
+        return SimdOps.squareDistance((ArrayVectorFloat)a, (ArrayVectorFloat)b);
     }
 
     @Override
-    public float squareDistance(float[] a, int aoffset, float[] b, int boffset, int length) {
-        return SimdOps.squareDistance(a, aoffset, b, boffset, length);
+    public float squareDistance(VectorFloat<?> a, int aoffset, VectorFloat<?> b, int boffset, int length) {
+        return SimdOps.squareDistance((ArrayVectorFloat) a, aoffset, (ArrayVectorFloat) b, boffset, length);
     }
 
     @Override
-    public int dotProduct(byte[] a, byte[] b) {
-        return SimdOps.dotProduct(a, b);
+    public int dotProduct(VectorByte<?> a, VectorByte<?> b) {
+        return SimdOps.dotProduct((ArrayVectorByte)a, (ArrayVectorByte)b);
     }
 
     @Override
-    public float dotProduct(float[] a, int aoffset, float[] b, int boffset, int length) {
-        return SimdOps.dotProduct(a, aoffset, b, boffset, length);
+    public float dotProduct(VectorFloat<?> a, int aoffset, VectorFloat<?> b, int boffset, int length) {
+        return SimdOps.dotProduct((ArrayVectorFloat)a, aoffset, (ArrayVectorFloat)b, boffset, length);
     }
 
     @Override
-    public float cosine(byte[] a, byte[] b) {
-        return SimdOps.cosineSimilarity(a, b);
+    public float cosine(VectorByte<?> a, VectorByte<?> b) {
+        return SimdOps.cosineSimilarity((ArrayVectorByte)a, (ArrayVectorByte)b);
     }
 
     @Override
-    public int squareDistance(byte[] a, byte[] b) {
-        return SimdOps.squareDistance(a, b);
+    public int squareDistance(VectorByte<?> a, VectorByte<?> b) {
+        return SimdOps.squareDistance((ArrayVectorByte)a, (ArrayVectorByte)b);
     }
 
     @Override
-    public float[] sum(List<float[]> vectors) {
+    public VectorFloat<?> sum(List<VectorFloat<?>> vectors) {
         return SimdOps.sum(vectors);
     }
 
     @Override
-    public float sum(float[] vector) {
-        return SimdOps.sum(vector);
+    public float sum(VectorFloat<?> vector) {
+        return SimdOps.sum((ArrayVectorFloat) vector);
     }
 
     @Override
-    public void divInPlace(float[] vector, float divisor) {
-        SimdOps.divInPlace(vector, divisor);
+    public void divInPlace(VectorFloat<?> vector, float divisor) {
+        SimdOps.divInPlace((ArrayVectorFloat)vector, divisor);
     }
 
     @Override
-    public void addInPlace(float[] v1, float[] v2) {
-        SimdOps.addInPlace(v1, v2);
+    public void addInPlace(VectorFloat<?> v1, VectorFloat<?> v2) {
+        SimdOps.addInPlace((ArrayVectorFloat)v1, (ArrayVectorFloat)v2);
     }
 
     @Override
-    public void subInPlace(float[] v1, float[] v2) {
-        SimdOps.subInPlace(v1, v2);
-    }
-
-    @Override
-    public float[] sub(float[] lhs, float[] rhs) {
-        return SimdOps.sub(lhs, rhs);
-    }
-
-    @Override
-    public float assembleAndSum(float[] data, int baseIndex, byte[] baseOffsets) {
-        //TODO: Re-enable once Jdk bug is fixed
-        //return SimdOps.assembleAndSum(data, baseIndex, baseOffsets);
-
-        float sum = 0f;
-        for (int i = 0; i < baseOffsets.length; i++) {
-            sum += data[baseIndex * i + Byte.toUnsignedInt(baseOffsets[i])];
-        }
-        return sum;
+    public VectorFloat<?> sub(VectorFloat<?> lhs, VectorFloat<?> rhs) {
+        return SimdOps.sub((ArrayVectorFloat)lhs, (ArrayVectorFloat)rhs);
     }
 }
