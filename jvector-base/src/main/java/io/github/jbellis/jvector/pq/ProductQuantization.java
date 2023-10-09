@@ -20,7 +20,6 @@ import io.github.jbellis.jvector.disk.Io;
 import io.github.jbellis.jvector.disk.RandomAccessReader;
 import io.github.jbellis.jvector.graph.RandomAccessVectorValues;
 import io.github.jbellis.jvector.util.RamUsageEstimator;
-import io.github.jbellis.jvector.util.PhysicalCoreExecutor;
 import io.github.jbellis.jvector.vector.VectorUtil;
 
 import java.io.DataOutput;
@@ -74,8 +73,7 @@ public class ProductQuantization {
         if (globallyCenter) {
             globalCentroid = KMeansPlusPlusClusterer.centroidOf(vectors);
             // subtract the centroid from each vector
-            List<float[]> finalVectors = vectors;
-            vectors = PhysicalCoreExecutor.instance.submit(() -> finalVectors.stream().parallel().map(v -> VectorUtil.sub(v, globalCentroid)).collect(Collectors.toList()));
+            vectors = vectors.stream().parallel().map(v -> VectorUtil.sub(v, globalCentroid)).collect(Collectors.toList());
         } else {
             globalCentroid = null;
         }
@@ -104,7 +102,7 @@ public class ProductQuantization {
      * Encodes the given vectors in parallel using the PQ codebooks.
      */
     public byte[][] encodeAll(List<float[]> vectors) {
-        return PhysicalCoreExecutor.instance.submit(() ->vectors.stream().parallel().map(this::encode).toArray(byte[][]::new));
+        return vectors.stream().parallel().map(this::encode).toArray(byte[][]::new);
     }
 
     /**
@@ -212,15 +210,15 @@ public class ProductQuantization {
     }
 
     static float[][][] createCodebooks(List<float[]> vectors, int M, int[][] subvectorSizeAndOffset) {
-        return PhysicalCoreExecutor.instance.submit(() -> IntStream.range(0, M).parallel()
+        return IntStream.range(0, M).parallel()
                 .mapToObj(m -> {
                     float[][] subvectors = vectors.stream().parallel()
                             .map(vector -> getSubVector(vector, m, subvectorSizeAndOffset))
-                            .toArray(float[][]::new);
+                            .toArray(s -> new float[s][]);
                     var clusterer = new KMeansPlusPlusClusterer(subvectors, CLUSTERS, VectorUtil::squareDistance);
                     return clusterer.cluster(K_MEANS_ITERATIONS);
                 })
-                .toArray(float[][][]::new));
+                .toArray(s -> new float[s][][]);
     }
     
     static int closetCentroidIndex(float[] subvector, float[][] codebook) {
