@@ -25,7 +25,7 @@ import java.io.UncheckedIOException;
 
 public class CachingGraphIndex implements GraphIndex<float[]>, AutoCloseable, Accountable
 {
-    private static final int CACHE_DISTANCE = 3;
+    private static final int BFS_DISTANCE = 3;
 
     private final GraphCache cache;
     private final OnDiskGraphIndex<float[]> graph;
@@ -34,7 +34,7 @@ public class CachingGraphIndex implements GraphIndex<float[]>, AutoCloseable, Ac
     {
         this.graph = graph;
         try {
-            this.cache = GraphCache.load(graph, CACHE_DISTANCE);
+            this.cache = GraphCache.load(graph, BFS_DISTANCE);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -56,8 +56,8 @@ public class CachingGraphIndex implements GraphIndex<float[]>, AutoCloseable, Ac
     }
 
     @Override
-    public int maxDegree() {
-        return graph.maxDegree();
+    public int maxEdgesPerNode() {
+        return graph.maxEdgesPerNode();
     }
 
     @Override
@@ -66,7 +66,7 @@ public class CachingGraphIndex implements GraphIndex<float[]>, AutoCloseable, Ac
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         graph.close();
     }
 
@@ -113,11 +113,6 @@ public class CachingGraphIndex implements GraphIndex<float[]>, AutoCloseable, Ac
         @Override
         public int getNeighborCount(int node) {
             return View.super.getNeighborCount(node);
-        }
-
-        @Override
-        public void close() throws Exception {
-            view.close();
         }
     }
 }

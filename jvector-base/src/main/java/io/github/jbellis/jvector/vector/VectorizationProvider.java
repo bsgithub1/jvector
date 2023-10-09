@@ -60,7 +60,7 @@ public abstract class VectorizationProvider {
 
   // *** Lookup mechanism: ***
 
-  protected static final Logger LOG = Logger.getLogger(VectorizationProvider.class.getName());
+  private static final Logger LOG = Logger.getLogger(VectorizationProvider.class.getName());
 
   /** The minimal version of Java that has the bugfix for JDK-8301190. */
   private static final Version VERSION_JDK8301190_FIXED = Version.parse("20.0.2");

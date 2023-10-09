@@ -27,8 +27,8 @@ import java.nio.file.Path;
 import java.util.logging.Logger;
 
 /**
- * Simple sample implementation of RandomAccessReader.
- * It provides a bare minimum to run against disk in reasonable time.
+ * DO NOT use this for anything you care about.
+ * Lies about implementing interfaces. Bare minimum I/O to run against disk in reasonable time.
  * Does not handle files above 2 GB.
  */
 public class SimpleMappedReader implements RandomAccessReader {
@@ -86,13 +86,6 @@ public class SimpleMappedReader implements RandomAccessReader {
     @Override
     public int readInt() {
         return mbb.getInt();
-    }
-
-    @Override
-    public void read(int[] ints, int offset, int count) {
-        for (int i = 0; i < count; i++) {
-            ints[offset + i] = mbb.getInt();
-        }
     }
 
     @Override

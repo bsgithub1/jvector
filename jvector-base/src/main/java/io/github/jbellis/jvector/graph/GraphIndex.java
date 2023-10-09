@@ -24,7 +24,6 @@
 
 package io.github.jbellis.jvector.graph;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -37,7 +36,7 @@ import java.util.Arrays;
  * All methods are threadsafe.  Operations that require persistent state are wrapped
  * in a View that should be created per accessing thread.
  */
-public interface GraphIndex<T> extends AutoCloseable {
+public interface GraphIndex<T> {
   /** Returns the number of nodes in the graph */
   int size();
 
@@ -57,12 +56,9 @@ public interface GraphIndex<T> extends AutoCloseable {
   /**
    * @return the maximum number of edges per node
    */
-  int maxDegree();
+  int maxEdgesPerNode();
 
-  @Override
-  void close() throws IOException;
-
-  interface View<T> extends AutoCloseable {
+  interface View<T> {
     /**
      * Iterator over the neighbors of a given node.  Only the most recently instantiated iterator
      * is guaranteed to be valid.

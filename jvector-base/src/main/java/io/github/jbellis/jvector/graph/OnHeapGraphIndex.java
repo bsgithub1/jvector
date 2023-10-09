@@ -26,10 +26,9 @@ package io.github.jbellis.jvector.graph;
 
 import io.github.jbellis.jvector.util.Accountable;
 import io.github.jbellis.jvector.util.RamUsageEstimator;
-import org.jctools.maps.NonBlockingHashMapLong;
 
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
 /**
@@ -40,11 +39,10 @@ import java.util.function.BiFunction;
  * and `nextNeighbor` operations.
  */
 public final class OnHeapGraphIndex<T> implements GraphIndex<T>, Accountable {
-
   // the current graph entry node on the top level. -1 if not set
-  private final AtomicLong entryPoint = new AtomicLong(-1);
+  private final AtomicReference<Integer> entryPoint; 
 
-  private final NonBlockingHashMapLong<ConcurrentNeighborSet> nodes;
+  private final ConcurrentHashMap<Integer, ConcurrentNeighborSet> nodes;
 
   // max neighbors/edges per node
   final int nsize0;
@@ -53,9 +51,11 @@ public final class OnHeapGraphIndex<T> implements GraphIndex<T>, Accountable {
   OnHeapGraphIndex(
       int M, BiFunction<Integer, Integer, ConcurrentNeighborSet> neighborFactory) {
     this.neighborFactory = neighborFactory;
+    this.entryPoint =
+        new AtomicReference<>(-1); // Entry node should be negative until a node is added
     this.nsize0 = 2 * M;
 
-    this.nodes = new NonBlockingHashMapLong<>(1024);
+    this.nodes = new ConcurrentHashMap<>();
   }
 
   /**
@@ -86,7 +86,7 @@ public final class OnHeapGraphIndex<T> implements GraphIndex<T>, Accountable {
    * @param node the node to add, represented as an ordinal on the level 0.
    */
   public void addNode(int node) {
-    nodes.put(node, neighborFactory.apply(node, maxDegree()));
+    nodes.put(node, neighborFactory.apply(node, maxEdgesPerNode()));
   }
 
   /** must be called after addNode once neighbors are linked in all levels. */
@@ -107,12 +107,12 @@ public final class OnHeapGraphIndex<T> implements GraphIndex<T>, Accountable {
   }
 
   @Override
-  public int maxDegree() {
+  public int maxEdgesPerNode() {
     return nsize0;
   }
 
   int entry() {
-    return (int) entryPoint.get();
+    return entryPoint.get();
   }
 
   @Override
@@ -120,11 +120,11 @@ public final class OnHeapGraphIndex<T> implements GraphIndex<T>, Accountable {
     // We avoid the temptation to optimize this by using ArrayNodesIterator.
     // This is because, while the graph will contain sequential ordinals once the graph is complete,
     // we should not assume that that is the only time it will be called.
-    var keysInts = Arrays.stream(nodes.keySetLong()).iterator();
+    var keysInts = nodes.keySet().stream().mapToInt(Integer::intValue).iterator();
     return new NodesIterator(nodes.size()) {
       @Override
       public int nextInt() {
-        return keysInts.next().intValue();
+        return keysInts.nextInt();
       }
 
       @Override
@@ -139,7 +139,7 @@ public final class OnHeapGraphIndex<T> implements GraphIndex<T>, Accountable {
     // the main graph structure
     long total = concurrentHashMapRamUsed(size());
     long chmSize = concurrentHashMapRamUsed(size());
-    long neighborSize = neighborsRamUsed(maxDegree()) * size();
+    long neighborSize = neighborsRamUsed(maxEdgesPerNode()) * size();
 
     total += chmSize + neighborSize;
 
@@ -150,8 +150,8 @@ public final class OnHeapGraphIndex<T> implements GraphIndex<T>, Accountable {
     int entryCount = (int) (nodeLevel / CHM_LOAD_FACTOR);
     var graphBytesUsed =
         chmEntriesRamUsed(entryCount)
-            + neighborsRamUsed(maxDegree())
-            + nodeLevel * neighborsRamUsed(maxDegree());
+            + neighborsRamUsed(maxEdgesPerNode())
+            + nodeLevel * neighborsRamUsed(maxEdgesPerNode());
     var clockBytesUsed = Integer.BYTES;
     return graphBytesUsed + clockBytesUsed;
   }
@@ -213,11 +213,6 @@ public final class OnHeapGraphIndex<T> implements GraphIndex<T>, Accountable {
     return String.format("OnHeapGraphIndex(size=%d, entryPoint=%d)", size(), entryPoint.get());
   }
 
-  @Override
-  public void close() {
-    // no-op
-  }
-
   /**
    * Returns a view of the graph that is safe to use concurrently with updates performed on the
    * underlying graph.
@@ -228,6 +223,7 @@ public final class OnHeapGraphIndex<T> implements GraphIndex<T>, Accountable {
     return new ConcurrentGraphIndexView();
   }
 
+  // TODO should call this when build is complete
   void validateEntryNode() {
     if (size() == 0) {
       return;
@@ -255,17 +251,12 @@ public final class OnHeapGraphIndex<T> implements GraphIndex<T>, Accountable {
 
     @Override
     public int entryNode() {
-      return (int) entryPoint.get();
+      return OnHeapGraphIndex.this.entryPoint.get();
     }
 
     @Override
     public String toString() {
       return "OnHeapGraphIndexView(size=" + size() + ", entryPoint=" + entryPoint.get();
-    }
-
-    @Override
-    public void close() {
-      // no-op
     }
   }
 }

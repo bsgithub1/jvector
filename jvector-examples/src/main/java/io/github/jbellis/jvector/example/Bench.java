@@ -17,13 +17,12 @@
 package io.github.jbellis.jvector.example;
 
 import io.github.jbellis.jvector.disk.CachingGraphIndex;
+import io.github.jbellis.jvector.disk.CompressedVectors;
 import io.github.jbellis.jvector.disk.OnDiskGraphIndex;
 import io.github.jbellis.jvector.example.util.DataSet;
 import io.github.jbellis.jvector.example.util.Hdf5Loader;
 import io.github.jbellis.jvector.example.util.ReaderSupplierFactory;
-import io.github.jbellis.jvector.example.util.SiftLoader;
 import io.github.jbellis.jvector.graph.*;
-import io.github.jbellis.jvector.pq.CompressedVectors;
 import io.github.jbellis.jvector.pq.ProductQuantization;
 import io.github.jbellis.jvector.vector.VectorEncoding;
 import io.github.jbellis.jvector.vector.VectorSimilarityFunction;
@@ -57,19 +56,19 @@ public class Bench {
 
         var graphPath = testDirectory.resolve("graph" + M + efConstruction + ds.name);
         try {
-            try (var outputStream = new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(graphPath)))) {
-                OnDiskGraphIndex.write(onHeapGraph, floatVectors, outputStream);
-            }
-            try (var onDiskGraph = new CachingGraphIndex(new OnDiskGraphIndex<>(ReaderSupplierFactory.open(graphPath), 0))) {
-                int queryRuns = 2;
-                for (int overquery : efSearchOptions) {
-                    for (boolean useDisk : diskOptions) {
-                        start = System.nanoTime();
-                        var pqr = performQueries(ds, floatVectors, useDisk ? cv : null, useDisk ? onDiskGraph : onHeapGraph, topK, topK * overquery, queryRuns);
-                        var recall = ((double) pqr.topKFound) / (queryRuns * ds.queryVectors.size() * topK);
-                        System.out.format("  Query PQ=%b top %d/%d recall %.4f in %.2fs after %s nodes visited%n",
-                                          useDisk, topK, overquery, recall, (System.nanoTime() - start) / 1_000_000_000.0, pqr.nodesVisited);
-                    }
+            DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(graphPath)));
+            OnDiskGraphIndex.write(onHeapGraph, floatVectors, outputStream);
+            outputStream.flush();
+            var onDiskGraph = new CachingGraphIndex(new OnDiskGraphIndex<>(ReaderSupplierFactory.open(graphPath), 0));
+
+            int queryRuns = 10;
+            for (int overquery : efSearchOptions) {
+                for (boolean useDisk : diskOptions) {
+                    start = System.nanoTime();
+                    var pqr = performQueries(ds, floatVectors, useDisk ? cv : null, useDisk ? onDiskGraph : onHeapGraph, topK, topK * overquery, queryRuns);
+                    var recall = ((double) pqr.topKFound) / (queryRuns * ds.queryVectors.size() * topK);
+                    System.out.format("  Query PQ=%b top %d/%d recall %.4f in %.2fs after %s nodes visited%n",
+                            useDisk, topK, overquery, recall, (System.nanoTime() - start) / 1_000_000_000.0, pqr.nodesVisited);
                 }
             }
         }
@@ -113,9 +112,9 @@ public class Bench {
                 SearchResult sr;
                 if (cv != null) {
                     var view = index.getView();
-                    NeighborSimilarity.ApproximateScoreFunction sf = cv.approximateScoreFunctionFor(queryVector, ds.similarityFunction);
+                    NeighborSimilarity.ApproximateScoreFunction sf = (other) -> cv.decodedSimilarity(other, queryVector, ds.similarityFunction);
                     NeighborSimilarity.ReRanker<float[]> rr = (j, vectors) -> ds.similarityFunction.compare(queryVector, vectors.get(j));
-                    sr = new GraphSearcher.Builder<>(view)
+                    sr = new GraphSearcher.Builder(view)
                             .build()
                             .search(sf, rr, efSearch, null);
                 } else {
@@ -134,15 +133,6 @@ public class Bench {
     public static void main(String[] args) throws IOException {
         System.out.println("Heap space available is " + Runtime.getRuntime().maxMemory());
 
-        var mGrid = List.of(8, 12, 16, 24, 32, 48, 64);
-        var efConstructionGrid = List.of(60, 80, 100, 120, 160, 200, 400, 600, 800);
-        var efSearchGrid = List.of(1, 2);
-        var diskGrid = List.of(false, true);
-
-        // this dataset contains more than 10k query vectors, so we limit it with .subList
-        var adaSet = loadWikipediaData();
-        gridSearch(adaSet, mGrid, efConstructionGrid, diskGrid, efSearchGrid);
-
         var files = List.of(
                 // large files not yet supported
                 // "hdf5/deep-image-96-angular.hdf5",
@@ -151,8 +141,12 @@ public class Bench {
                 "hdf5/glove-100-angular.hdf5",
                 "hdf5/glove-200-angular.hdf5",
                 "hdf5/sift-128-euclidean.hdf5");
+        var mGrid = List.of(8, 12, 16, 24, 32, 48, 64);
+        var efConstructionGrid = List.of(60, 80, 100, 120, 160, 200, 400, 600, 800);
+        var efSearchFactor = List.of(1, 2);
+        var diskOptions = List.of(false, true);
         for (var f : files) {
-            gridSearch(Hdf5Loader.load(f), mGrid, efConstructionGrid, diskGrid, efSearchGrid);
+            gridSearch(Hdf5Loader.load(f), mGrid, efConstructionGrid, diskOptions, efSearchFactor);
         }
 
         // tiny dataset, don't waste time building a huge index
@@ -160,36 +154,21 @@ public class Bench {
         mGrid = List.of(8, 12, 16, 24);
         efConstructionGrid = List.of(40, 60, 80, 100, 120, 160);
         for (var f : files) {
-            gridSearch(Hdf5Loader.load(f), mGrid, efConstructionGrid, diskGrid, efSearchGrid);
+            gridSearch(Hdf5Loader.load(f), mGrid, efConstructionGrid, diskOptions, efSearchFactor);
         }
-    }
-
-    private static DataSet loadWikipediaData() throws IOException {
-        var baseVectors = SiftLoader.readFvecs("fvec/pages_ada_002_100k_base_vectors.fvec");
-        var queryVectors = SiftLoader.readFvecs("fvec/pages_ada_002_100k_query_vectors_10k.fvec").subList(0, 10_000);
-        var gt = SiftLoader.readIvecs("fvec/pages_ada_002_100k_indices_query_vectors_10k.ivec").subList(0, 10_000);
-        var ds = new DataSet("wikipedia",
-                             VectorSimilarityFunction.DOT_PRODUCT,
-                             baseVectors,
-                             queryVectors,
-                             gt);
-        System.out.format("%nWikipedia: %d base and %d query vectors loaded, dimensions %d%n",
-                          baseVectors.size(), queryVectors.size(), baseVectors.get(0).length);
-        return ds;
     }
 
     private static void gridSearch(DataSet ds, List<Integer> mGrid, List<Integer> efConstructionGrid, List<Boolean> diskOptions, List<Integer> efSearchFactor) throws IOException {
         var start = System.nanoTime();
-        int originalDimension = ds.baseVectors.get(0).length;
-        var pqDims = originalDimension / 4;
-        ListRandomAccessVectorValues ravv = new ListRandomAccessVectorValues(ds.baseVectors, originalDimension);
-        ProductQuantization pq = ProductQuantization.compute(ravv, pqDims, ds.similarityFunction == VectorSimilarityFunction.EUCLIDEAN);
+        var pqDims = ds.baseVectors.get(0).length / 2;
+        ProductQuantization pq = ProductQuantization.compute(ds.baseVectors, pqDims, ds.similarityFunction == VectorSimilarityFunction.EUCLIDEAN);
         System.out.format("PQ@%s build %.2fs,%n", pqDims, (System.nanoTime() - start) / 1_000_000_000.0);
 
         start = System.nanoTime();
         var quantizedVectors = pq.encodeAll(ds.baseVectors);
+        System.out.format("PQ encode %.2fs,%n", (System.nanoTime() - start) / 1_000_000_000.0);
+
         var compressedVectors = new CompressedVectors(pq, quantizedVectors);
-        System.out.format("PQ encoded %d vectors [%.2f MB] in %.2fs,%n", ds.baseVectors.size(), (compressedVectors.memorySize()/1024f/1024f) , (System.nanoTime() - start) / 1_000_000_000.0);
 
         var testDirectory = Files.createTempDirectory("BenchGraphDir");
 

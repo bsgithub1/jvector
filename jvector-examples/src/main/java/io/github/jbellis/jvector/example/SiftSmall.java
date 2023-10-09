@@ -17,11 +17,11 @@
 package io.github.jbellis.jvector.example;
 
 import io.github.jbellis.jvector.disk.CachingGraphIndex;
+import io.github.jbellis.jvector.disk.CompressedVectors;
 import io.github.jbellis.jvector.disk.OnDiskGraphIndex;
 import io.github.jbellis.jvector.example.util.ReaderSupplierFactory;
 import io.github.jbellis.jvector.example.util.SiftLoader;
 import io.github.jbellis.jvector.graph.*;
-import io.github.jbellis.jvector.pq.CompressedVectors;
 import io.github.jbellis.jvector.pq.ProductQuantization;
 import io.github.jbellis.jvector.vector.VectorEncoding;
 import io.github.jbellis.jvector.vector.VectorSimilarityFunction;
@@ -40,12 +40,11 @@ import java.util.stream.IntStream;
 public class SiftSmall {
 
     public static void testRecall(ArrayList<float[]> baseVectors, ArrayList<float[]> queryVectors, ArrayList<HashSet<Integer>> groundTruth, Path testDirectory) throws IOException, InterruptedException, ExecutionException {
-        int originalDimension = baseVectors.get(0).length;
-        var ravv = new ListRandomAccessVectorValues(baseVectors, originalDimension);
+        var ravv = new ListRandomAccessVectorValues(baseVectors, baseVectors.get(0).length);
 
         var start = System.nanoTime();
-        var pqDims = originalDimension / 2;
-        ProductQuantization pq = ProductQuantization.compute(new ListRandomAccessVectorValues(baseVectors, originalDimension), pqDims, false);
+        var pqDims = baseVectors.get(0).length / 2;
+        ProductQuantization pq = ProductQuantization.compute(baseVectors, pqDims, false);
         System.out.format("  PQ@%s build %.2fs,%n", pqDims, (System.nanoTime() - start) / 1_000_000_000.0);
 
         start = System.nanoTime();
@@ -82,13 +81,13 @@ public class SiftSmall {
             var queryVector = queryVectors.get(i);
             SearchResult.NodeScore[] nn;
             var view = graph.getView();
-            var searcher = new GraphSearcher.Builder<>(view).build();
+            var searcher = new GraphSearcher.Builder(view).build();
             if (compressedVectors == null) {
                 NeighborSimilarity.ExactScoreFunction sf = (j) -> VectorSimilarityFunction.EUCLIDEAN.compare(queryVector, ravv.vectorValue(j));
                 nn = searcher.search(sf, null, 100, null).getNodes();
             }
             else {
-                NeighborSimilarity.ApproximateScoreFunction sf = compressedVectors.approximateScoreFunctionFor(queryVector, VectorSimilarityFunction.EUCLIDEAN);
+                NeighborSimilarity.ApproximateScoreFunction sf = (j) -> compressedVectors.decodedSimilarity(j, queryVector, VectorSimilarityFunction.EUCLIDEAN);
                 NeighborSimilarity.ReRanker<float[]> rr = (j, vectors) -> VectorSimilarityFunction.EUCLIDEAN.compare(queryVector, vectors.get(j));
                 nn = searcher.search(sf, rr, 100, null).getNodes();
             }

@@ -31,18 +31,21 @@ import java.util.Arrays;
 
 /**
  * NeighborArray encodes the neighbors of a node and their mutual scores in the graph as a pair
- * of growable arrays. Nodes are arranged in the sorted order of their scores in descending order,
- * i.e. the most-similar neighbors are first.
+ * of growable arrays. Nodes are arranged in the sorted order of their scores in descending order
+ * (if scoresDescOrder is true), or in the ascending order of their scores (if scoresDescOrder is
+ * false)
  */
 public class NeighborArray {
+  protected final boolean scoresDescOrder; // TODO we actually don't use desc=false anymore
   protected int size;
 
   float[] score;
   int[] node;
 
-  public NeighborArray(int maxSize) {
+  public NeighborArray(int maxSize, boolean descOrder) {
     node = new int[maxSize];
     score = new float[maxSize];
+    this.scoresDescOrder = descOrder;
   }
 
   /**
@@ -56,7 +59,8 @@ public class NeighborArray {
     }
     if (size > 0) {
       float previousScore = score[size - 1];
-      assert ((previousScore >= newScore))
+      assert ((scoresDescOrder && (previousScore >= newScore))
+              || (scoresDescOrder == false && (previousScore <= newScore)))
           : "Nodes are added in the incorrect order! Comparing "
               + newScore
               + " to "
@@ -72,7 +76,10 @@ public class NeighborArray {
     if (size == node.length) {
       growArrays();
     }
-    int insertionPoint = descSortFindRightMostInsertionPoint(newScore);
+    int insertionPoint =
+    scoresDescOrder
+    ? descSortFindRightMostInsertionPoint(newScore)
+    : ascSortFindRightMostInsertionPoint(newScore);
     System.arraycopy(node, insertionPoint, node, insertionPoint + 1, size - insertionPoint);
     System.arraycopy(score, insertionPoint, score, insertionPoint + 1, size - insertionPoint);
     node[insertionPoint] = newNode;
@@ -117,6 +124,20 @@ public class NeighborArray {
   @Override
   public String toString() {
     return "NeighborArray[" + size + "]";
+  }
+
+  protected final int ascSortFindRightMostInsertionPoint(float newScore) {
+    int insertionPoint = Arrays.binarySearch(score, 0, size, newScore);
+    if (insertionPoint >= 0) {
+      // find the right most position with the same score
+      while ((insertionPoint < size - 1) && (score[insertionPoint + 1] == score[insertionPoint])) {
+        insertionPoint++;
+      }
+      insertionPoint++;
+    } else {
+      insertionPoint = -insertionPoint - 1;
+    }
+    return insertionPoint;
   }
 
   protected final int descSortFindRightMostInsertionPoint(float newScore) {
