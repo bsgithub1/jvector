@@ -24,7 +24,6 @@
 
 package io.github.jbellis.jvector.graph;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -57,10 +56,10 @@ public interface GraphIndex<T> extends AutoCloseable {
   /**
    * @return the maximum number of edges per node
    */
-  int maxDegree();
+  int maxEdgesPerNode();
 
   @Override
-  void close() throws IOException;
+  default void close() {}
 
   interface View<T> extends AutoCloseable {
     /**
@@ -81,6 +80,9 @@ public interface GraphIndex<T> extends AutoCloseable {
      * at the end of the search.
      */
     T getVector(int node);
+
+    @Override
+    default void close() {}
 
     // for compatibility with Cassandra's ExtendedHnswGraph.  Not sure if we still need it
     default int[] getSortedNodes() {

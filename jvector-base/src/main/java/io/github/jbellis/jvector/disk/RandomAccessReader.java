@@ -23,15 +23,14 @@ import java.io.IOException;
  * to use a more efficient option like FloatBuffer.
  */
 public interface RandomAccessReader extends AutoCloseable {
-    void seek(long offset) throws IOException;
+    public void seek(long offset) throws IOException;
 
-    int readInt() throws IOException;
+    public int readInt() throws IOException;
 
-    void readFully(byte[] bytes) throws IOException;
+    public void readFully(byte[] bytes) throws IOException;
 
-    void readFully(float[] floats) throws IOException;
+    public void readFully(float[] floats) throws IOException;
 
-    void read(int[] ints, int offset, int count) throws IOException;
-
-    void close() throws IOException;
+    @Override
+    void close();
 }
