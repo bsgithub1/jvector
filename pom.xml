@@ -1,19 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         child.project.url.inherit.append.path="false">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.jbellis</groupId>
     <artifactId>jvector-parent</artifactId>
-    <version>${revision}</version>
+    <version>0.9-SNAPSHOT</version>
     <packaging>pom</packaging>
     <!-- Project Metadata setup -->
     <name>JVector parent</name>
     <description>JVector: the most advanced embedded vector search engine</description>
     <url>https://github.com/jbellis/jvector</url>
-    <scm child.scm.connection.inherit.append.path="false"
-         child.scm.developerConnection.inherit.append.path="false"
-         child.scm.url.inherit.append.path="false">
+    <scm>
         <connection>scm:git:git://github.com/jbellis/jvector.git</connection>
         <developerConnection>scm:git:git@github.com:jbellis/jvector.git</developerConnection>
         <url>http://github.com/jbellis/jvector/tree/main/</url>
@@ -29,27 +26,11 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <developers>
-        <developer>
-            <name>Jonathan Ellis</name>
-            <email>jbellis@gmail.com</email>
-            <organization>JVector</organization>
-            <organizationUrl>https://github.com/jbellis/jvector</organizationUrl>
-        </developer>
-    </developers>
     <!-- Build property abstractions: versions, etc -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.install.skip>true</maven.install.skip>
-        <revision>1.0.2-SNAPSHOT</revision>
     </properties>
-    <modules>
-        <module>jvector-base</module>
-        <module>jvector-twenty</module>
-        <module>jvector-tests</module>
-        <module>jvector-multirelease</module>
-        <module>jvector-examples</module>
-    </modules>
     <build>
         <resources>
             <resource>
@@ -59,14 +40,6 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
@@ -74,6 +47,28 @@
                     <skip>true</skip>
                     <executable>${java.home}/bin/java</executable>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>sift</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${java.home}/bin/java</executable>
+                            <workingDirectory>${project.parent.basedir}</workingDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>bench</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${java.home}/bin/java</executable>
+                            <workingDirectory>${project.parent.basedir}</workingDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -89,7 +84,6 @@
                 <version>3.3.0</version>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
                 <configuration>
@@ -103,83 +97,37 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.5.0</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>aggregate-jar</goal>
-                        </goals>
-                        <configuration>
-                            <skippedModules>jvector-examples,jvector-tests</skippedModules>
-                            <additionalJOptions>
-                                <additionalJOption>--add-modules=jdk.incubator.vector</additionalJOption>
-                            </additionalJOptions>
-                            <release>20</release>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.5.0</version>
-                <configuration>
-                    <flattenMode>ossrh</flattenMode>
-                    <pomElements>
-                        <dependencies>resolve</dependencies>
-                    </pomElements>
-                </configuration>
-                <executions>
-                    <!-- enable flattening -->
-                    <execution>
-                        <id>flatten</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                    </execution>
-                    <!-- ensure proper cleanup -->
-                    <execution>
-                        <id>flatten.clean</id>
-                        <phase>clean</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
-    <!-- Only include dependencies that are needed for the multirelease jar to run -->
     <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.9.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.carrotsearch.randomizedtesting</groupId>
+            <artifactId>randomizedtesting-runner</artifactId>
+            <version>2.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>1.35</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>1.35</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-engine</artifactId>
-                <version>5.9.1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.carrotsearch.randomizedtesting</groupId>
-                <artifactId>randomizedtesting-runner</artifactId>
-                <version>2.8.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openjdk.jmh</groupId>
-                <artifactId>jmh-core</artifactId>
-                <version>1.35</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openjdk.jmh</groupId>
-                <artifactId>jmh-generator-annprocess</artifactId>
-                <version>1.35</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <modules>
+        <module>jvector-base</module>
+        <module>jvector-twenty</module>
+        <module>jvector-multirelease</module>
+    </modules>
 </project>
