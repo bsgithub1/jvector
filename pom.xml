@@ -5,7 +5,7 @@
 
     <groupId>io.github.jbellis</groupId>
     <artifactId>jvector-parent</artifactId>
-    <version>${revision}</version>
+    <version>dev</version>
     <packaging>pom</packaging>
     <!-- Project Metadata setup -->
     <name>JVector parent</name>
@@ -41,12 +41,11 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.install.skip>true</maven.install.skip>
-        <revision>1.0.2-SNAPSHOT</revision>
+        <jvector.version>0.9.3-SNAPSHOT</jvector.version>
     </properties>
     <modules>
         <module>jvector-base</module>
         <module>jvector-twenty</module>
-        <module>jvector-tests</module>
         <module>jvector-multirelease</module>
         <module>jvector-examples</module>
     </modules>
@@ -61,7 +60,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>3.1.1</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
@@ -115,7 +113,7 @@
                             <goal>aggregate-jar</goal>
                         </goals>
                         <configuration>
-                            <skippedModules>jvector-examples,jvector-tests</skippedModules>
+                            <skippedModules>jvector-examples</skippedModules>
                             <additionalJOptions>
                                 <additionalJOption>--add-modules=jdk.incubator.vector</additionalJOption>
                             </additionalJOptions>
