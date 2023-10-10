@@ -1,0 +1,264 @@
+Repository Name : AdminLTE_daily 
+Date : 17-Sep-2023 11:38 
+
+"Issue Name","Issue Description","File Name","File Path","Line Number","Criticality","Status","Issue datetime","Snapshot label","Snapshot fixed issue label","KPI","Tags"
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","dns_records.php","dns_records.php",94,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","taillog-FTL.php","taillog-FTL.php",27,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",192,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",193,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",194,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",195,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",196,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",199,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",200,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",201,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",203,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",204,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",205,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",207,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",208,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",209,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",210,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",211,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",212,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",213,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",214,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",215,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","db_graph.php","db_graph.php",70,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","db_graph.php","db_graph.php",71,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","db_graph.php","db_graph.php",72,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","db_queries.php","db_queries.php",197,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","db_queries.php","db_queries.php",198,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","db_queries.php","db_queries.php",199,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","db_queries.php","db_queries.php",200,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","queryads.php","queryads.php",46,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"ExitExpression","
+      The function getResponseFTL() contains an exit expression.
+    ","FTL.php","scripts/pi-hole/php/FTL.php",75,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"ExitExpression","
+      The function sendRequestFTL() contains an exit expression.
+    ","FTL.php","scripts/pi-hole/php/FTL.php",59,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","footer.php","scripts/pi-hole/php/footer.php",102,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"ExitExpression","
+      The function SQLite3_connect() contains an exit expression.
+    ","database.php","scripts/pi-hole/php/database.php",69,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"ExitExpression","
+      The function SQLite3_connect() contains an exit expression.
+    ","database.php","scripts/pi-hole/php/database.php",73,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"ExitExpression","
+      The function log_and_die() contains an exit expression.
+    ","auth.php","scripts/pi-hole/php/auth.php",29,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups-clients.php","groups-clients.php",88,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups-clients.php","groups-clients.php",89,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups-clients.php","groups-clients.php",90,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups-clients.php","groups-clients.php",91,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups-clients.php","groups-clients.php",92,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","taillog.php","taillog.php",27,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","settings.php","settings.php",1435,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","settings.php","settings.php",1436,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","settings.php","settings.php",1437,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups.php","groups.php",79,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups.php","groups.php",80,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups.php","groups.php",81,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups.php","groups.php",82,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups-domains.php","groups-domains.php",141,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups-domains.php","groups-domains.php",142,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups-domains.php","groups-domains.php",143,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups-domains.php","groups-domains.php",144,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","index.php","index.php",297,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","index.php","index.php",298,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","debug.php","debug.php",22,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","cname_records.php","cname_records.php",97,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","cname_records.php","cname_records.php",98,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","queries.php","queries.php",179,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","queries.php","queries.php",180,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","queries.php","queries.php",181,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups-adlists.php","groups-adlists.php",80,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups-adlists.php","groups-adlists.php",81,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups-adlists.php","groups-adlists.php",82,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","groups-adlists.php","groups-adlists.php",83,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","gravity.php","gravity.php",28,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","dns_records.php","dns_records.php",92,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","dns_records.php","dns_records.php",93,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","header.php","scripts/pi-hole/php/header.php",191,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","db_lists.php","db_lists.php",142,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","db_lists.php","db_lists.php",143,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","db_lists.php","db_lists.php",144,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","auditlog.php","auditlog.php",75,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","auditlog.php","auditlog.php",76,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","messages.php","messages.php",44,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","messages.php","messages.php",45,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","network.php","network.php",69,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","network.php","network.php",70,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"Generic.PHP.DisallowShortOpenTag","""Short PHP opening tag used with echo; expected \""<?php echo $cacheVer ...\"" but found \""<?= $cacheVer ...\""""","network.php","network.php",71,"high","NEW","17-Sep-2023 10:06","master",,"[""Robustness""]",""
+"CyclomaticComplexity","
+      The function archive_restore_table() has a Cyclomatic Complexity of 28. The configured cyclomatic complexity threshold is 10.
+    ","teleporter.php","scripts/pi-hole/php/teleporter.php",73,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"IfStatementAssignment","
+      Avoid assigning values to variables in if clauses and the like (line '294', column '5').
+    ","teleporter.php","scripts/pi-hole/php/teleporter.php",292,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"NPathComplexity","
+      The function archive_restore_table() has an NPath complexity of 19032. The configured NPath complexity threshold is 200.
+    ","teleporter.php","scripts/pi-hole/php/teleporter.php",73,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"UnusedFormalParameter","
+      Avoid unused parameters such as '$key'.
+    ","teleporter.php","scripts/pi-hole/php/teleporter.php",307,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"ErrorControlOperator","
+      Remove error control operator '@' on line 49.
+    ","FTL.php","scripts/pi-hole/php/FTL.php",33,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"UnusedLocalVariable","
+      Avoid unused local variables such as '$errno'.
+    ","FTL.php","scripts/pi-hole/php/FTL.php",49,"medium","NEW","17-Sep-2023 10:06","master",,"[""Efficiency"",""Maintainability""]",""
+"UnusedLocalVariable","
+      Avoid unused local variables such as '$errstr'.
+    ","FTL.php","scripts/pi-hole/php/FTL.php",49,"medium","NEW","17-Sep-2023 10:06","master",,"[""Efficiency"",""Maintainability""]",""
+"CyclomaticComplexity","
+      The function add_to_table() has a Cyclomatic Complexity of 21. The configured cyclomatic complexity threshold is 10.
+    ","database.php","scripts/pi-hole/php/database.php",94,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"CyclomaticComplexity","
+      The function remove_from_table() has a Cyclomatic Complexity of 15. The configured cyclomatic complexity threshold is 10.
+    ","database.php","scripts/pi-hole/php/database.php",227,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"MissingImport","
+      Missing class import via use statement (line '42', column '14').
+    ","database.php","scripts/pi-hole/php/database.php",42,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"NPathComplexity","
+      The function add_to_table() has an NPath complexity of 44280. The configured NPath complexity threshold is 200.
+    ","database.php","scripts/pi-hole/php/database.php",94,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"NPathComplexity","
+      The function remove_from_table() has an NPath complexity of 1296. The configured NPath complexity threshold is 200.
+    ","database.php","scripts/pi-hole/php/database.php",227,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"UnusedLocalVariable","
+      Avoid unused local variables such as '$initialcount'.
+    ","database.php","scripts/pi-hole/php/database.php",252,"medium","NEW","17-Sep-2023 10:06","master",,"[""Efficiency"",""Maintainability""]",""
+"CyclomaticComplexity","
+      The function check_cors() has a Cyclomatic Complexity of 14. The configured cyclomatic complexity threshold is 10.
+    ","auth.php","scripts/pi-hole/php/auth.php",32,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"NPathComplexity","
+      The function check_cors() has an NPath complexity of 864. The configured NPath complexity threshold is 200.
+    ","auth.php","scripts/pi-hole/php/auth.php",32,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"UnusedLocalVariable","
+      Avoid unused local variables such as '$pwhash'.
+    ","auth.php","scripts/pi-hole/php/auth.php",127,"medium","NEW","17-Sep-2023 10:06","master",,"[""Efficiency"",""Maintainability""]",""
+"CyclomaticComplexity","
+      The function addCustomCNAMEEntry() has a Cyclomatic Complexity of 12. The configured cyclomatic complexity threshold is 10.
+    ","func.php","scripts/pi-hole/php/func.php",289,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"CyclomaticComplexity","
+      The function addCustomDNSEntry() has a Cyclomatic Complexity of 13. The configured cyclomatic complexity threshold is 10.
+    ","func.php","scripts/pi-hole/php/func.php",127,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"CyclomaticComplexity","
+      The function deleteCustomCNAMEEntry() has a Cyclomatic Complexity of 10. The configured cyclomatic complexity threshold is 10.
+    ","func.php","scripts/pi-hole/php/func.php",333,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"CyclomaticComplexity","
+      The function deleteCustomDNSEntry() has a Cyclomatic Complexity of 10. The configured cyclomatic complexity threshold is 10.
+    ","func.php","scripts/pi-hole/php/func.php",171,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"MissingImport","
+      Missing class import via use statement (line '115', column '25').
+    ","func.php","scripts/pi-hole/php/func.php",115,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"MissingImport","
+      Missing class import via use statement (line '276', column '25').
+    ","func.php","scripts/pi-hole/php/func.php",276,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"NPathComplexity","
+      The function addCustomCNAMEEntry() has an NPath complexity of 385. The configured NPath complexity threshold is 200.
+    ","func.php","scripts/pi-hole/php/func.php",289,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"NPathComplexity","
+      The function addCustomDNSEntry() has an NPath complexity of 385. The configured NPath complexity threshold is 200.
+    ","func.php","scripts/pi-hole/php/func.php",127,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"UndefinedVariable","
+      Avoid using undefined variables such as '$customDNSFile' which will lead to PHP notices.
+    ","func.php","scripts/pi-hole/php/func.php",209,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"UndefinedVariable","
+      Avoid using undefined variables such as '$customDNSFile' which will lead to PHP notices.
+    ","func.php","scripts/pi-hole/php/func.php",211,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"UndefinedVariable","
+      Avoid using undefined variables such as '$msg' which will lead to PHP notices.
+    ","func.php","scripts/pi-hole/php/func.php",393,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"UndefinedVariable","
+      Avoid using undefined variables such as '$msg' which will lead to PHP notices.
+    ","func.php","scripts/pi-hole/php/func.php",403,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"UnusedFormalParameter","
+      Avoid unused parameters such as '$error_on_failure'.
+    ","func.php","scripts/pi-hole/php/func.php",71,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"UnusedLocalVariable","
+      Avoid unused local variables such as '$msg'.
+    ","func.php","scripts/pi-hole/php/func.php",393,"medium","NEW","17-Sep-2023 10:06","master",,"[""Efficiency"",""Maintainability""]",""
+"UnusedLocalVariable","
+      Avoid unused local variables such as '$msg'.
+    ","func.php","scripts/pi-hole/php/func.php",403,"medium","NEW","17-Sep-2023 10:06","master",,"[""Efficiency"",""Maintainability""]",""
+"CyclomaticComplexity","
+      The function addStaticDHCPLease() has a Cyclomatic Complexity of 16. The configured cyclomatic complexity threshold is 10.
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",196,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"CyclomaticComplexity","
+      The function readDNSserversList() has a Cyclomatic Complexity of 11. The configured cyclomatic complexity threshold is 10.
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",162,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"CyclomaticComplexity","
+      The function readStaticLeasesFile() has a Cyclomatic Complexity of 12. The configured cyclomatic complexity threshold is 10.
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",102,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"ErrorControlOperator","
+      Remove error control operator '@' on line 109.
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",102,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"ErrorControlOperator","
+      Remove error control operator '@' on line 166.
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",162,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"MissingImport","
+      Missing class import via use statement (line '202', column '14').
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",202,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"MissingImport","
+      Missing class import via use statement (line '208', column '14').
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",208,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"MissingImport","
+      Missing class import via use statement (line '213', column '14').
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",213,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"MissingImport","
+      Missing class import via use statement (line '218', column '14').
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",218,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"MissingImport","
+      Missing class import via use statement (line '233', column '15').
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",233,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"MissingImport","
+      Missing class import via use statement (line '237', column '15').
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",237,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"MissingImport","
+      Missing class import via use statement (line '241', column '15').
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",241,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"NPathComplexity","
+      The function addStaticDHCPLease() has an NPath complexity of 2809. The configured NPath complexity threshold is 200.
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",196,"medium","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"UnusedLocalVariable","
+      Avoid unused local variables such as '$key'.
+    ","savesettings.php","scripts/pi-hole/php/savesettings.php",152,"medium","NEW","17-Sep-2023 10:06","master",,"[""Efficiency"",""Maintainability""]",""
+"BooleanArgumentFlag","
+      The method archive_insert_into_table has a boolean flag argument $flush, which is a certain sign of a Single Responsibility Principle violation.
+    ","teleporter.php","scripts/pi-hole/php/teleporter.php",225,"low","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"BooleanArgumentFlag","
+      The method archive_insert_into_table has a boolean flag argument $wildcardstyle, which is a certain sign of a Single Responsibility Principle violation.
+    ","teleporter.php","scripts/pi-hole/php/teleporter.php",225,"low","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"BooleanArgumentFlag","
+      The method archive_restore_table has a boolean flag argument $flush, which is a certain sign of a Single Responsibility Principle violation.
+    ","teleporter.php","scripts/pi-hole/php/teleporter.php",73,"low","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"BooleanArgumentFlag","
+      The method add_to_table has a boolean flag argument $returnnum, which is a certain sign of a Single Responsibility Principle violation.
+    ","database.php","scripts/pi-hole/php/database.php",94,"low","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"BooleanArgumentFlag","
+      The method add_to_table has a boolean flag argument $wildcardstyle, which is a certain sign of a Single Responsibility Principle violation.
+    ","database.php","scripts/pi-hole/php/database.php",94,"low","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"BooleanArgumentFlag","
+      The method remove_from_table has a boolean flag argument $returnnum, which is a certain sign of a Single Responsibility Principle violation.
+    ","database.php","scripts/pi-hole/php/database.php",227,"low","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"BooleanArgumentFlag","
+      The method addCustomCNAMEEntry has a boolean flag argument $json, which is a certain sign of a Single Responsibility Principle violation.
+    ","func.php","scripts/pi-hole/php/func.php",289,"low","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"BooleanArgumentFlag","
+      The method addCustomDNSEntry has a boolean flag argument $json, which is a certain sign of a Single Responsibility Principle violation.
+    ","func.php","scripts/pi-hole/php/func.php",127,"low","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"BooleanArgumentFlag","
+      The method pihole_execute has a boolean flag argument $error_on_failure, which is a certain sign of a Single Responsibility Principle violation.
+    ","func.php","scripts/pi-hole/php/func.php",71,"low","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"BooleanArgumentFlag","
+      The method returnError has a boolean flag argument $json, which is a certain sign of a Single Responsibility Principle violation.
+    ","func.php","scripts/pi-hole/php/func.php",398,"low","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"BooleanArgumentFlag","
+      The method returnSuccess has a boolean flag argument $json, which is a certain sign of a Single Responsibility Principle violation.
+    ","func.php","scripts/pi-hole/php/func.php",388,"low","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
+"BooleanArgumentFlag","
+      The method gravity_last_update has a boolean flag argument $raw, which is a certain sign of a Single Responsibility Principle violation.
+    ","gravity.php","scripts/pi-hole/php/gravity.php",11,"low","NEW","17-Sep-2023 10:06","master",,"[""Maintainability""]",""
