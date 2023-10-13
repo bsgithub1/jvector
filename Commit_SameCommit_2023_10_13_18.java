@@ -1,10 +1,10 @@
-public class Commit8 {
+public class Commit9 {
 
 	public static void main(String args[]) {
 		try {
 			System.out.println("Screenshot taken for test : ");
 		} catch (Exception e) {
-			System.out.println("Exception "8 + e.getMessage());
+			System.out.println("Exception "9 + e.getMessage());
 		}
 	}
 }
